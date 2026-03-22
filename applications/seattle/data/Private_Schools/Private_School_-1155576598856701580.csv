@@ -1,0 +1,75 @@
+﻿OBJECTID,NAME,SCHOOL_STREET_ADDRESS,SCHOOL_CITY,SCHOOL_STATE,SCHOOL_ZIP,SCHOOL_COUNTY,PUBLIC_SCHOOL_DISTRICT,FOR_PROFIT_OR_NON_PROFIT,SE_ANNO_CAD_DATA,x,y
+1,Academy for Precision Learning,1432 15th Ave,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1275603.30386302,227448.192476958
+2,Ashé Preparatory Academy,2600 South Holgate Street,Seattle,WA,98144,King,Seattle,For-profit,System.Byte[],1278819.16306631,217391.335058659
+3,Assumption / St. Bridget School,6220 32nd Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1280873.09894042,249575.180083618
+4,Bertschi School,2227 Tenth Avenue E,Seattle,WA,98102,King,Seattle,Nonprofit,System.Byte[],1273846.55493322,236744.506982476
+5,Bishop Blanchet High School,8200 Wallingford Ave N,Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1270458.73099375,254904.195065081
+6,Bright Water Waldorf School,"1414 S Weller St, Suite C",Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1275610.02187902,221530.566934898
+7,Billings Middle School,12351 8th Ave NE,Seattle,WA,98125,King,Seattle,Nonprofit,System.Byte[],1274074.46392545,265893.928964332
+8,Brightmont Academy - Seattle,"115 NE 100th Street, Ste 200",Seattle,WA,98125,King,Seattle,For-profit,System.Byte[],1272607.42814794,259197.392189473
+9,Cristo Rey Jesuit Seattle High School,10001 57th Ave. S,Seattle,WA,98178,King,Seattle,Nonprofit,System.Byte[],1287166.65984285,189467.040182069
+10,Derech Emunah Seattle Jewish Girls High School,5142 S Holly St,Seattle,WA,98118,King,Seattle,Nonprofit,System.Byte[],1286087.80998576,201409.070082292
+11,Concordia Lutheran School,7040 36th Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1281847.52908541,251700.553781793
+12,Christ the King School,415 N 117th St,Seattle,WA,98133,King,Seattle,Nonprofit,System.Byte[],1266212.5478854,264095.333186492
+13,Dartmoor School,6515 15th Ave NE,Seattle,WA,98115,King,Seattle,For-profit,System.Byte[],1276053.06885548,250085.76075615
+14,Epiphany School,3611 E Denny Way,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1281979.93298954,228836.946974382
+15,Fusion Academy,214 E Galer St Suite 200,Seattle,WA,98102,King,Seattle,For-profit,System.Byte[],1272580.40881991,234265.655907944
+16,Giddens School,2120 21st Ave S,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1277216.24997666,216466.671825722
+17,Holy Family Bilingual Catholic School,9615 20th Ave SW,Seattle,WA,98106,King,Seattle,Nonprofit,System.Byte[],1263320.42999443,192316.649912983
+18,Holy Names Academy,728 21st Ave E,Seattle,WA,98112,King,Seattle,Nonprofit,System.Byte[],1277713.97893718,231974.074913591
+19,Hamlin Robinson School,1701 20th Ave S,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1276904.79685634,218075.497043371
+20,Hope Lutheran Church and School,4456 42nd Ave SW,Seattle,WA,98116,King,Seattle,Nonprofit,System.Byte[],1257331.36483631,209380.690954462
+21,Holy Rosary School - Seattle,4142 42nd Ave SW,Seattle,WA,98116,King,Seattle,Nonprofit,System.Byte[],1257363.31293234,210110.468043208
+22,Lake Washington Girls Middle School,2100 S Walker Street,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1277217.24991266,216466.156433716
+23,KapKa Cooperative School,510 N 49th St,Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1266110.18289329,246178.699056149
+24,Laurel Academy,12700 35th Ave NE,Seattle,WA,98125,King,Seattle,Nonprofit,System.Byte[],1281843.3548774,266438.084036887
+25,Morningside Academy,1605 17th Ave,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1276094.59698352,228088.311965615
+26,Menachem Mendel Seattle Cheder,620 20th Ave. S,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1277084.38898453,221214.583958581
+27,Matheia School,2205 NW 67th St,Seattle,WA,98117,King,Seattle,Nonprofit,System.Byte[],1258255.00803725,250967.442101046
+28,Northwest Montessori School,4619 37th Ave SW,Seattle,WA,98126,King,Seattle,Nonprofit,System.Byte[],1258789.4127738,208634.967049703
+29,O'Dea High School,802 Terry Avenue,Seattle,WA,98104,King,Seattle,Nonprofit,System.Byte[],1272522.98507586,225256.166106716
+30,Northwest Montessori School,4910 Phinney Ave N,Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1265841.95511702,246200.886000171
+31,Northwest Montessori School,7400 25th Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1279082.69407457,252304.12415041
+32,Our Lady of Fatima Parish School,3301 West Dravus St,Seattle,WA,98199,King,Seattle,Nonprofit,System.Byte[],1254330.65200123,240025.202153847
+33,Pacific Crest School,600 NW Bright St,Seattle,WA,98107,King,Seattle,Nonprofit,System.Byte[],1263197.3366823,244584.164142504
+34,Puget Sound Community School,660 S Dearborn St,Seattle,WA,98134,King,Seattle,Nonprofit,System.Byte[],1272576.31793992,221071.371990427
+35,Our Lady of Guadalupe Catholic School,3401 SW Myrtle St,Seattle,WA,98126,King,Seattle,Nonprofit,System.Byte[],1259484.8198785,200382.100033253
+36,Seattle Academy of Arts and Sciences,1201 E Union Street,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1274657.45483805,227003.699036509
+37,Seattle Amistad School,1501 10th Ave. E.,Seattle,WA,98102,King,Seattle,Nonprofit,System.Byte[],1273705.63851707,234219.581859902
+38,Seattle Classical Christian School,810 18th Avenue,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1276559.69189599,225857.72751534
+39,Seattle Area German American School,11010 Greenwood Ave N,Seattle,WA,98133,King,Seattle,Nonprofit,System.Byte[],1265814.31998099,262329.393088683
+40,Our Lady of the Lake Catholic School,3520 NE 89th Ave,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1281860.12486142,256372.312506586
+41,Seattle Country Day School,2619 4th Ave N,Seattle,WA,98109,King,Seattle,Nonprofit,System.Byte[],1266345.95703754,238395.841896176
+42,Seattle Jewish Community School,7217 Woodlawn Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1272963.39589231,251917.43103002
+43,Seattle Nativity School,4200 S Mead St,Seattle,WA,98118,King,Seattle,Nonprofit,System.Byte[],1283205.1398388,204211.870213166
+44,Seattle Girls' School,1700 24th Avenue South,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1278395.74789788,217944.751891226
+45,Spruce Street School,914 Virginia St,Seattle,WA,98101,King,Seattle,Nonprofit,System.Byte[],1269993.55800126,228631.504158169
+46,Seattle Preparatory School,2400 11th Ave E,Seattle,WA,98102,King,Seattle,Nonprofit,System.Byte[],1274738.42418213,237461.73584722
+47,St. Anne School,101 W Lee St,Seattle,WA,98119,King,Seattle,Nonprofit,System.Byte[],1264472.89975561,233932.400035605
+48,Spring Academy,"9725 3rd Ave NE, Suite 125",Seattle,WA,98115,King,Seattle,For-profit,System.Byte[],1272728.72805206,258903.486909166
+49,St. Alphonsus Parish School,5816 15th Ave NW,Seattle,WA,98107,King,Seattle,Nonprofit,System.Byte[],1260392.69763944,248724.664754748
+50,Seattle Waldorf School,2728 NE 100th St,Seattle,WA,98125,King,Seattle,Nonprofit,System.Byte[],1279952.45017147,259343.721917629
+51,St. Benedict Catholic School,4811 Wallingford Ave N,Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1269974.37502526,245752.765487701
+52,St. Catherine of Siena School,8524 8th Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1274269.37195764,255636.473081827
+53,St. Joseph School,700 18th Avenue East,Seattle,WA,98112,King,Seattle,Nonprofit,System.Byte[],1276725.37496817,231640.67203325
+54,St. George Parish School,5117 13th Ave S,Seattle,WA,98108,King,Seattle,Nonprofit,System.Byte[],1274230.44587761,206291.888071299
+55,Taproot School,9131 California Ave SW,Seattle,WA,98136,King,Seattle,For-profit,System.Byte[],1256337.74019529,194254.609978974
+56,The Bush School,3400 E Harrison Street,Seattle,WA,98112,King,Seattle,Nonprofit,System.Byte[],1281511.37490906,230611.593696207
+57,St. Matthew School,1230 NE 127th St,Seattle,WA,98125,King,Seattle,Nonprofit,System.Byte[],1276006.97611943,266702.986053154
+58,St. John Catholic School,120 N 79th Street,Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1264996.37214015,254093.529016241
+59,The Downtown School: A Lakeside School,160 John Street,Seattle,WA,98109,King,Seattle,Nonprofit,System.Byte[],1265467.38500464,229860.403295428
+60,The Lake and Park School,3201 Hunter Blvd S.,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1282027.67014159,213118.899982288
+61,The Meridian School,"4649 Sunnyside Ave N, Suite 242",Seattle,WA,98103,King,Seattle,Nonprofit,System.Byte[],1271353.15013066,245835.386095792
+62,The Perkins School,9005 Roosevelt Way NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1274795.74885419,256757.027962968
+63,The Northwest School,1415 Summit Avenue,Seattle,WA,98122,King,Seattle,Nonprofit,System.Byte[],1272284.41598761,227316.528092831
+64,Tilden School,4105 California Ave SW,Seattle,WA,98116,King,Seattle,Nonprofit,System.Byte[],1256832.5151078,210386.63220349
+65,Torah Day School of Seattle,5142 South Holly Street,Seattle,WA,98118,King,Seattle,Nonprofit,System.Byte[],1286087.80998576,201409.070082292
+66,Trillium Academy,2706 S. Jackson St.,Seattle,WA,98144,King,Seattle,Nonprofit,System.Byte[],1279347.04095484,222110.035223499
+67,University Cooperative School,5601 University Ave NE,Seattle,WA,98105,King,Seattle,Nonprofit,System.Byte[],1275781.88075919,247775.592177778
+68,The Valley School,318 30th Ave E,Seattle,WA,98112,King,Seattle,Nonprofit,System.Byte[],1280478.30802801,230262.48220785
+69,University Child Development School,5062 9th Ave NE,Seattle,WA,98105,King,Seattle,Nonprofit,System.Byte[],1274573.94488595,246702.375152677
+70,Villa Academy,5001 NE 50th Street,Seattle,WA,98105,King,Seattle,Nonprofit,System.Byte[],1285582.30470523,245396.366959333
+71,Lakeside School (Middle),13510 1st Avenue NE,Seattle,WA,98125,King,Shoreline,Nonprofit,System.Byte[],1272497.62584384,268855.460103363
+72,University Preparatory Academy,8000 25th Ave NE,Seattle,WA,98115,King,Seattle,Nonprofit,System.Byte[],1279160.91404265,254038.840120196
+73,Westside School,10404 34th Ave SW,Seattle,WA,98146,King,Seattle,Nonprofit,System.Byte[],1259687.11306271,189695.427830309
+74,Lakeside School (Upper),14050 1st Avenue NE,Seattle,WA,98125,King,Shoreline,Nonprofit,System.Byte[],1272784.55800413,270535.466953084

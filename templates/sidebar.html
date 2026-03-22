@@ -1,0 +1,159 @@
+<div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="sidebar"
+    aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="sidebarLabel">Map-It</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <main class="d-flex flex-nowrap">
+            <div class="d-flex flex-column flex-shrink-0 p-3" style="width: 100%">
+                <!-- <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <svg class="bi pe-none me-2" width="40" height="32" aria-hidden="true">
+                    <use xlink:href="#bootstrap"></use>
+                    </svg>
+                    <span class="fs-4">Sidebar</span>
+                </a> -->
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link active" aria-current="page">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#home"></use>
+                            </svg>
+                            Home
+                        </a>
+                    </li>
+                    {% url 'account_email' as email_url_ %}
+                    {% if email_url_ %}
+                    <li>
+                        <a href="{{ email_url_ }}" class="nav-link">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#speedometer2"></use>
+                            </svg>
+                            Change Email
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% url 'account_change_password' as change_password_url_ %}
+
+                    {% if change_password_url_ %}
+                    <li>
+                        <a href="{{ change_password_url_ }}" class="nav-link">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#table"></use>
+                            </svg>
+                            Change Password
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% url 'account_change_phone' as phone_url_ %}
+                    {% if phone_url_ %}
+                    <li>
+                        <a href="{{phone_url_}}" class="nav-link">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#grid"></use>
+                            </svg>
+                            Change Phone
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% url 'socialaccount_connections' as connections_url_ %}
+                    {% if connections_url_ %}
+                    <li>
+                        <a href="{{connections_url_}}" class="nav-link">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#people-circle"></use>
+                            </svg>
+                            Third-Party Accounts
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% url 'mfa_index' as mfa_index_url_ %}
+                    {% if mfa_index_url_ %}
+                    <li>
+                        <a href="{{mfa_index_url_}}" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-lock" viewBox="0 0 16 16">
+                                <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 5.996V14H3s-1 0-1-1 1-4 6-4q.845.002 1.544.107a4.5 4.5 0 0 0-.803.918A11 11 0 0 0 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664zM9 13a1 1 0 0 1 1-1v-1a2 2 0 1 1 4 0v1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm3-3a1 1 0 0 0-1 1v1h2v-1a1 1 0 0 0-1-1"/>
+                            </svg>
+                            Two-Factor Authentication
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% url 'usersessions_list' as usersessions_list_url_ %}
+                    {% if usersessions_list_url_ %}
+                    <li>
+                        <a href="{{usersessions_list_url_}}" class="nav-link">
+                            <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                <use xlink:href="#people-circle"></use>
+                            </svg>
+                            Sessions
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% comment %}
+                        <li>
+                            <a href="#" class="nav-link">
+                                <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                    <use xlink:href="#speedometer2"></use>
+                                </svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                    <use xlink:href="#table"></use>
+                                </svg>
+                                Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                    <use xlink:href="#grid"></use>
+                                </svg>
+                                Products
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <svg class="bi pe-none me-2" width="16" height="16" aria-hidden="true">
+                                    <use xlink:href="#people-circle"></use>
+                                </svg>
+                                Customers
+                            </a>
+                        </li>
+                    {% endcomment %}
+                </ul>
+                <hr />
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if user.profile.avatar.url %}
+                            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}'s avatar" width="32" height="32" class="rounded-circle">
+                        {% else %}
+                            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                        {% endif %} 
+                        <strong class="p-2">{{ user.username }}</strong>
+                    </a>
+                    <ul class="dropdown-menu text-small shadow">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'profile-details' username=request.user.username %}">Profile</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider" />
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'account_logout' %}">Sign out</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

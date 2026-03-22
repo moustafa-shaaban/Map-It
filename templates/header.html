@@ -1,0 +1,218 @@
+{% load static i18n %}
+<header class="p-3 mb-3 border-bottom">
+  
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Map-It</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+        Menu <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse bd-mode-toggle" id="navbarTogglerDemo02">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About</a>
+          </li>
+          {% if request.user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Seattle
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'seattle:seattle-homepage' %}">App Home</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:seattle-map' %}">Map</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:import-schools' %}">Import Schools Data</a></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:export-schools' %}">Export Schools Data</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:import-libraries' %}">Import Libraries Data</a></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:export-libraries' %}">Export Libraries Data</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:import-hospitals' %}">Import Hospitals Data</a></li>
+                <li><a class="dropdown-item" href="{% url 'seattle:export-hospitals' %}">Export Hospitals Data</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="offcanvas" href="#sidebar" role="button" aria-controls="sidebar">Sidebar</a>
+            </li>
+          {% endif %}
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" id="bd-theme" data-bs-toggle="dropdown" aria-expanded="false">
+              Theme
+              <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
+                  aria-pressed="false">
+                  <span>
+                    <i class="fa-solid fa-sun"></i>
+                  </span>
+                  <span class="p-2">Light</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark"
+                  aria-pressed="false">
+                  <span>
+                    <i class="fa-solid fa-moon"></i>
+                  </span>
+                  
+                  <span class="p-2">Dark</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto"
+                  aria-pressed="true">
+                  <span>
+                    <i class="fa-solid fa-laptop"></i>
+                  </span>
+                  <span class="p-2">System</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        {% if request.user.is_authenticated %}
+        
+      <!-- 
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> 
+          <input type="search" class="form-control" placeholder="Search..." aria-label="Search" wfd-id="id1"> 
+        </form> 
+      -->
+        <div class="dropdown">    
+          <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
+            {% if user.profile.avatar.url %}
+              <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}'s avatar" width="32" height="32" class="rounded-circle">
+            {% else %}
+               <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+            {% endif %} 
+          </a>
+          <ul class="dropdown-menu text-small">
+            <li>
+              <a class="dropdown-item" href="{% url 'profile-details' username=request.user.username %}">Profile</a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'account_logout' %}">Sign out</a>
+            </li>
+          </ul>
+        </div>
+        {% else %}
+          <div class="col-md-3 text-end">
+            <button type="button" class="btn btn-outline-primary me-2">
+              <a href="{% url 'account_login' %}" class="nav-link px-2">Login</a>
+            </button>
+            <button type="button" class="btn btn-primary">
+              <a href="{% url 'account_signup' %}" class="nav-link px-2">Sign up</a>
+            </button>
+          </div>
+      {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% if request.user.is_authenticated %}
+    {% include 'sidebar.html' %}
+  {% endif %}
+  
+  {% comment %}
+
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"> 
+      {% if request.user.is_authenticated %}
+        <button class="btn mx-2" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      {% endif %}
+        
+      <a href="{% url 'home' %}" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">Home</a>
+      <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+        <li>
+          <a href="{% url 'about' %}" class="nav-link px-2 link-body-emphasis">About</a>
+        </li>
+        <li class="nav-item dropdown">
+          <button class="btn btn-link nav-link px-0 px-lg-2 py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
+            aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
+            <span id="bd-theme-text"><i class="fa-solid fa-circle-half-stroke"></i></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
+                aria-pressed="false">
+                <span>
+                  <i class="fa-solid fa-sun"></i>
+                </span>
+                <span class="p-2">Light</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark"
+                aria-pressed="false">
+                <span>
+                  <i class="fa-solid fa-moon"></i>
+                </span>
+                <span class="p-2">Dark</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto"
+                aria-pressed="true">
+                <span>
+                  <i class="fa-solid fa-laptop"></i>
+                </span>
+                <span class="p-2">System</span>
+              </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      {% if request.user.is_authenticated %}
+      <!-- 
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> 
+          <input type="search" class="form-control" placeholder="Search..." aria-label="Search" wfd-id="id1"> 
+        </form> 
+      -->
+        <div class="dropdown text-end">    
+          <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
+            {% if user.profile.avatar.url %}
+              <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}'s avatar" width="32" height="32" class="rounded-circle">
+            {% else %}
+               <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+            {% endif %} 
+          </a>
+          <ul class="dropdown-menu text-small">
+            <li>
+              <a class="dropdown-item" href="{% url 'profile-details' username=request.user.username %}">Profile</a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'account_logout' %}">Sign out</a>
+            </li>
+          </ul>
+        </div>
+        {% include 'sidebar.html' %}
+        {% else %}
+          <div class="col-md-3 text-end">
+            <button type="button" class="btn btn-outline-primary me-2">
+              <a href="{% url 'account_login' %}" class="nav-link px-2">Login</a>
+            </button>
+            <button type="button" class="btn btn-primary">
+              <a href="{% url 'account_signup' %}" class="nav-link px-2">Sign up</a>
+            </button>
+          </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% endcomment %}
+</header>
