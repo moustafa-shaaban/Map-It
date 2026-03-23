@@ -17,7 +17,7 @@ from .filters import SchoolFilter, LibraryFilter, HospitalFilter
 
 class HomePage(generic.TemplateView):
     """ Class used for displaying website's main page. """
-    template_name = 'seattle_homepage.html'
+    template_name = 'seattle/seattle_homepage.html'
 
 LAYERS = [
     {
@@ -93,7 +93,7 @@ def index(request):
         'query': query,
         'count': len(all_coords)
     }
-    return render(request, 'map.html', context)
+    return render(request, 'seattle/map.html', context)
 
 # def index(request):
 #     # Create folium basemap
