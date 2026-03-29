@@ -209,3 +209,11 @@ __marimo__/
 .idea/
 
 staticfiles/
+
+node_modules
+.env.local*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.thumbs.db
