@@ -9,26 +9,44 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      {
+        text: 'Applications',
+        items: [
+          { text: 'Applications', link: '/applications' },
+          { text: 'Seattle', link: '/applications/seattle' },
+          { text: 'Item B', link: '/item-2' },
+        ]
+      },
       { text: 'Examples', link: '/markdown-examples' },
       { text: 'Team', link: '/team' },
     ],
 
     sidebar: [
       {
+        text: 'Applications',
+        items: [
+          { text: 'Applications', link: '/applications' },
+          { text: 'Seattle', link: '/applications/seattle' },
+          { text: 'Item B', link: '/item-2' },
+        ]
+      },
+      {
         text: 'Examples',
         items: [
           { text: 'Markdown Examples', link: '/markdown-examples' },
           { text: 'Runtime API Examples', link: '/api-examples' }
         ]
-      }
+      },
+      { text: 'Team', link: '/team' },
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/moustafa-shaaban/Map-It' }
     ],
     search: {
       provider: 'local'
     },
+    lastUpdated: true,
     lastUpdated: {
       text: 'Updated at',
       formatOptions: {
