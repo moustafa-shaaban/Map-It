@@ -3,20 +3,21 @@
 layout: home
 
 hero:
-  name: "Website Applications"
+  name: "Applications"
   tagline: A list of available applications in this project
   actions:
-    - theme: brand
-      text: Seattle Application
-      link: /applications/seattle
     - theme: alt
-      text: Folium
-      link: https://python-visualization.github.io/folium/latest/
+      text: Seattle
+      link: ./seattle/index.md
+
+    - theme: alt
+      text: Places
+      link: ./places/index.md
 
 ---
 
 
-# Seattle Application
+## 1. Seattle
 
 ### Libraries and Packages used
 
@@ -26,3 +27,14 @@ hero:
 
 * [Folium](https://python-visualization.github.io/folium/)
 
+[more information](./seattle/index.md)
+
+## 2. Places
+
+### Libraries and Packages used
+
+* [Django Web Framework](https://www.djangoproject.com/)
+
+* [django-import-export](https://django-import-export.readthedocs.io/en/latest/)
+
+* [Leaflet.js](https://leafletjs.com/)

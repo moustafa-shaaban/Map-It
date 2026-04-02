@@ -1,12 +1,19 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block title %}Import Schools Data{% endblock title %}
+{% block title %}Import Libraries Data{% endblock title %}
 
 
 {% block content %}
+<style>
+    ins {
+        background-color: transparent !important;
+        color: inherit !important;
+    }
+</style>
+
 <div class="container">
-    <h3 class="my-2 py-2 text-center">Import Schools Data</h3>
-    <form method="post" action="{% url 'seattle:import-schools' %}" enctype="multipart/form-data">
+    <h3 class="my-2 py-2 text-center">Import Libraries Data</h3>
+    <form method="post" action="{% url 'seattle:import-libraries' %}" enctype="multipart/form-data">
         {% csrf_token %}
         {% if not result %}
             <div class="col-md-4">
@@ -98,6 +105,5 @@
             }
         });
     </script>
-    
 </div>
 {% endblock content %}

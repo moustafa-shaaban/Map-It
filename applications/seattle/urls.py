@@ -8,15 +8,16 @@ app_name = 'seattle'
 urlpatterns = [
     path('', views.HomePage.as_view(), name='seattle-homepage'),
     path('map/', views.map_view, name='seattle-map'),
+    path('map2/', views.MapView.as_view(), name='seattle-map-2'),
 
     # Importing Data
-    path('import-hospitals/', views.import_hospitals_data, name='import-hospitals'),
-    path('import-schools/', views.import_schools_data, name='import-schools'),
-    path('import-libraries/', views.import_libraries_data, name='import-libraries'),
+    path('import-hospitals/', views.ImportHospitalsView.as_view(), name='import-hospitals'),
+    path('import-schools/', views.ImportSchoolsView.as_view(), name='import-schools'),
+    path('import-libraries/', views.ImportLibrariesView.as_view(), name='import-libraries'),
 
     # Exporting Data
-    path('export-hospitals/', views.export_hospitals_data, name='export-hospitals'),
-    path('export-schools/', views.export_schools_data, name='export-schools'),
-    path('export-libraries/', views.export_libraries_data, name='export-libraries'),
+    path('export-hospitals/', views.HospitalsExportView.as_view(), name='export-hospitals'),
+    path('export-schools/', views.SchoolsExportView.as_view(), name='export-schools'),
+    path('export-libraries/', views.LibrariesExportView.as_view(), name='export-libraries'),
 
 ]

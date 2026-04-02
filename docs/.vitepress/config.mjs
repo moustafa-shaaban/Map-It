@@ -14,11 +14,11 @@ export default defineConfig({
         items: [
           { text: 'Applications', link: '/applications' },
           { text: 'Seattle', link: '/applications/seattle' },
-          { text: 'Item B', link: '/item-2' },
+          { text: 'Places', link: '/applications/places' },
         ]
       },
-      { text: 'Examples', link: '/markdown-examples' },
-      { text: 'Team', link: '/team' },
+      // { text: 'Examples', link: '/markdown-examples' },
+      // { text: 'Team', link: '/team' },
     ],
 
     sidebar: [
@@ -26,8 +26,8 @@ export default defineConfig({
         text: 'Applications',
         items: [
           { text: 'Applications', link: '/applications' },
-          { text: 'Seattle', link: '/applications/seattle' },
-          { text: 'Item B', link: '/item-2' },
+          { text: 'Seattle', link: '/applications/seattle/index.md' },
+          { text: 'Places', link: '/applications/places/index.md' },
         ]
       },
       {
@@ -39,6 +39,9 @@ export default defineConfig({
       },
       { text: 'Team', link: '/team' },
     ],
+    outline: {
+      level: [2, 4]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/moustafa-shaaban/Map-It' }
@@ -47,12 +50,5 @@ export default defineConfig({
       provider: 'local'
     },
     lastUpdated: true,
-    lastUpdated: {
-      text: 'Updated at',
-      formatOptions: {
-        dateStyle: 'full',
-        timeStyle: 'medium'
-      }
-    },
   }
 })

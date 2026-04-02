@@ -20,6 +20,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('users/', include('applications.users.urls')),
     path('seattle/', include('applications.seattle.urls')),
+    path('places/', include('applications.places.urls')),
     
     # path(
     #     "settings/",

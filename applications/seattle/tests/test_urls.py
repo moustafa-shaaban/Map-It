@@ -93,7 +93,7 @@ class LibrariesDataImportPageTests(TestCase):
 
     def test_template_name_correct(self):
         response = self.client.get(reverse("seattle:import-libraries"))
-        self.assertTemplateUsed(response, "seattle/import_library_data.html")
+        self.assertTemplateUsed(response, "seattle/import_libraries_data.html")
 
 class LibrariesDataExporttPageTests(TestCase):
     def test_url_exists_at_correct_location(self):
@@ -106,4 +106,4 @@ class LibrariesDataExporttPageTests(TestCase):
 
     def test_template_name_correct(self):
         response = self.client.get(reverse("seattle:export-libraries"))
-        self.assertTemplateUsed(response, "seattle/export_library_data.html")
+        self.assertTemplateUsed(response, "seattle/export_libraries_data.html")

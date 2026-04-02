@@ -1,21 +1,25 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block title %}Export Schools Data{% endblock title %}
 
 
-{% block homepage %}
-    <h3>Export Schools Data</h3>
-    <form action="{% url 'seattle:export-schools' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>Please select the format of the file</p>
-        <select name="file-format" class="form-control my-3">
-            <option selected>Choose format...</option>
-            <option>CSV</option>
-            <option>JSON</option>
-            <option>XLS (Excel)</option>
-        </select>
-        <button class="btn btn-primary" type="submit">Export</button>
-    </form>
-
-    <a href="{% url 'seattle:seattle-map' %}">Return Home View</a><br />
-{% endblock homepage %}
+{% block content %}
+<div class="container">
+    <h3 class="text-center mt-3 mb-4">Export Schools Data</h3>
+    <p class="text-center mb-4">The total number of records that will be exported is: {{ count }}</p>
+    <p class="form-text">
+        Currently you can export the following file types <br>
+        CSV (Comma Separated Values) <br>
+        JSON files <br>
+        Microsoft Excel (.xlsx)<br>
+    </p>
+    <div class="col-md-7">
+        <form method="POST" action="{% url 'seattle:export-schools' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">Export Data</button>
+        </form>
+        <a class="btn btn-outline-danger" href="{% url 'seattle:seattle-homepage' %}">Return to homepage</a>
+    </div> 
+</div>
+{% endblock content %}

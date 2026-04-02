@@ -1,0 +1,116 @@
+[
+    {
+        "facility": "University of Washington Medical Center",
+        "address": "1959 NE Pacific St",
+        "latitude": "47.650344",
+        "longitude": "-122.309072"
+    },
+    {
+        "facility": "Harborview Medical Center",
+        "address": "325 9th Ave",
+        "latitude": "47.603993",
+        "longitude": "-122.323769"
+    },
+    {
+        "facility": "St. Elizabeth Hospital",
+        "address": "1455 Battersby Ave",
+        "latitude": "47.20918",
+        "longitude": "-121.98776"
+    },
+    {
+        "facility": "Kaiser Permanente Capitol Hill Campus",
+        "address": "201 16th Ave E ",
+        "latitude": "47.620136",
+        "longitude": "-122.312276"
+    },
+    {
+        "facility": "Swedish Medical Center - Issaquah Campus",
+        "address": "751 NE Blakely Dr",
+        "latitude": "47.536106",
+        "longitude": "-122.02193"
+    },
+    {
+        "facility": "Seattle VA Medical Center",
+        "address": "1660 S Columbian Way",
+        "latitude": "47.562454",
+        "longitude": "-122.309169"
+    },
+    {
+        "facility": "Swedish Medical Center - Cherry Hill",
+        "address": "500 17th Ave",
+        "latitude": "47.607055",
+        "longitude": "-122.309656"
+    },
+    {
+        "facility": "EvergreenHealth - Kirkland",
+        "address": "12040 NE 128th St",
+        "latitude": "47.715811",
+        "longitude": "-122.178707"
+    },
+    {
+        "facility": "Virginia Mason Medical Center",
+        "address": "1100 9th St",
+        "latitude": "47.60953",
+        "longitude": "-122.32793"
+    },
+    {
+        "facility": "Seattle Children's Hospital",
+        "address": "4800 Sand Point Way NE",
+        "latitude": "47.662313",
+        "longitude": "-122.281458"
+    },
+    {
+        "facility": "Overlake Hospital Medical Center",
+        "address": "1035 116th Ave NE",
+        "latitude": "47.621493",
+        "longitude": "-122.187688"
+    },
+    {
+        "facility": "MultiCare  Auburn Medical Center",
+        "address": "202 N Division St",
+        "latitude": "47.309291",
+        "longitude": "-122.228886"
+    },
+    {
+        "facility": "Swedish Medical Center - First Hill",
+        "address": "747 Broadway",
+        "latitude": "47.608842",
+        "longitude": "-122.321928"
+    },
+    {
+        "facility": "Snoqualmie Valley Hospital",
+        "address": "9801 Frontier Ave SE",
+        "latitude": "47.512387",
+        "longitude": "-121.88536"
+    },
+    {
+        "facility": "St. Francis Hospital",
+        "address": "34515 9th Ave S",
+        "latitude": "47.292612",
+        "longitude": "-122.327279"
+    },
+    {
+        "facility": "Valley Medical Center",
+        "address": "400 S 43rd St",
+        "latitude": "47.442273",
+        "longitude": "-122.214121"
+    },
+    {
+        "facility": "Highline Medical Center",
+        "address": "16251 Sylvester Rd SW",
+        "latitude": "47.4578",
+        "longitude": "-122.341419"
+    },
+    {
+        "facility": "Swedish Medical Center - Ballard Campus",
+        "address": "5300 Tallman Ave NW",
+        "latitude": "47.667365",
+        "longitude": "-122.379555"
+    },
+    {
+        "facility": "UW Medical Center - Northwest",
+        "address": "1550 N 115th ST",
+        "latitude": "47.714248",
+        "longitude": "-122.336888"
+    }
+]

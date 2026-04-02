@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     # My Apps
     'applications.users',
     'applications.seattle',
+    'applications.places',
 ]
 
 SITE_ID = 1

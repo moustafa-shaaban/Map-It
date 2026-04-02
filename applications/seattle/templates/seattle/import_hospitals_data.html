@@ -1,30 +1,104 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block title %}Import Hospitals Data{% endblock title %}
 
-
 {% block content %}
-    <h3>Import Hospitals Data</h3>
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="alert {{ message.tags }}"{% endif %}>{{ message }}</li><br>
-        Click <a href="{% url 'seattle:seattle-map' %}">here</a> to view the full map
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <form class="mt-3" action="{% url 'seattle:import-hospitals' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="importData">
-        <p>Please select the format of the file</p>
-        <select name="file-format" class="form-control my-3">
-            <option selected>Choose format...</option>
-            <option>CSV</option>
-            <option>JSON</option>
-            <option>XLS (Excel)</option>
-        </select>
-        <button class="btn btn-primary" type="submit">Import</button>
-    </form>
 
-    <a href="{% url 'seattle:seattle-map' %}">Return Home View</a><br />
+<div class="container">
+    <h3 class="my-2 py-2 text-center">Import Hospitals Data</h3>
+    
+    <form method="post" action="{% url 'seattle:import-hospitals' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if not result %}
+            <div class="col-md-4">
+                {{ form|crispy }}
+                <button class="btn btn-primary my-1" type="submit">Upload and Preview</button>
+            </div>
+        {% else %}
+    
+            <h5 class="my-2 py-4">Select Rows to Import</h5>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped table-bordered">
+                    <thead class="table-info">
+                        <tr>
+                            <th>
+                                <input class="form-check-input" type="checkbox" id="select-all">
+                            </th>
+                
+                            {% for header in result.diff_headers %}
+                                <th scope="col">{{ header|capfirst }}</th>
+                            {% endfor %}
+                
+                            <th>Import Type</th>
+                            <th>Validation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in result.rows %}
+                        <tr>
+                            <td>
+                                {% if not row.errors %}
+                                    <input class="form-check-input" type="checkbox" name="selected_rows" value="{{ forloop.counter0 }}" checked>
+                                {% else %}
+                                    <input class="form-check-input" type="checkbox" disabled>
+                                {% endif %}
+                            </td>
+                
+                            {% for field in row.diff %}
+                                <td>{{ field }}</td>
+                            {% endfor %}
+                
+                            <td>
+                                {% if row.import_type == 'skip' %}
+                                    <span class="badge bg-warning text-dark">Duplicate</span>
+                                {% elif row.import_type == 'new' %}
+                                    <span class="badge bg-success">New</span>
+                                {% elif row.import_type == 'update' %}
+                                    <span class="badge bg-info text-dark">Update</span>
+                                {% endif %}
+                            </td>
+                
+                            <td>
+                                {% if row.errors %}
+                                    {% for error in row.errors %}
+                                        <span class="badge bg-danger">{{ error.error }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="badge bg-success">Valid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" name="cancel_import" 
+                    onclick="return confirm('Are you sure you want to discard this upload?');" 
+                    class="btn btn-outline-danger mx-2" formnovalidate>
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary my-3" name="confirm_import">Import Selected Rows</button>
+        {% endif %}
+    </form>
+    
+    <script>
+        // Simple JS to toggle all checkboxes
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const selectAll = document.getElementById('select-all');
+            
+            // Check if it exists (since it only appears after the upload)
+            if (selectAll) {
+                selectAll.addEventListener('click', function() {
+                    const checkboxes = document.getElementsByName('selected_rows');
+                    for (let checkbox of checkboxes) {
+                        if (!checkbox.disabled) {
+                            checkbox.checked = this.checked;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</div>
+
 {% endblock content %}

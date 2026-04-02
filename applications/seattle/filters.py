@@ -11,7 +11,6 @@ class LocationFilter(django_filters.FilterSet):
         )
 
     class Meta:
-        # Base filter - will be subclassed per model
         fields = ['q']
 
 
@@ -26,7 +25,6 @@ class LibraryFilter(LocationFilter):
         fields = ['q']
 
 class HospitalFilter(LocationFilter):
-    # Hospital uses 'facility' instead of 'name'
     def filter_q(self, queryset, name, value):
         return queryset.filter(
             Q(facility__icontains=value) | Q(address__icontains=value)
