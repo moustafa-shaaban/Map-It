@@ -8,7 +8,7 @@ app_name = 'seattle'
 urlpatterns = [
     path('', views.HomePage.as_view(), name='seattle-homepage'),
     path('map/', views.map_view, name='seattle-map'),
-    path('map2/', views.MapView.as_view(), name='seattle-map-2'),
+    #path('map/', views.MapView.as_view(), name='seattle-map'),
 
     # Importing Data
     path('import-hospitals/', views.ImportHospitalsView.as_view(), name='import-hospitals'),

@@ -8,6 +8,24 @@ This page lists the sturcture of seattle application, and the files used to buil
 [[toc]]
 
 
+## Utils
+
+We start by a very useful util function that will be used to many actions in the project, it's main functionality is to remove some special characters, trim/strip white spaces from text and save strings data in lower-case.
+
+This is useful becuase we need to make sure that the data (facility name for hospitals, and name for schools and libraries) are unique.
+
+```python
+from django.utils.encoding import force_str
+import unicodedata
+import re
+
+def normalize_text(text):
+    text = force_str(text or "")
+    text = unicodedata.normalize("NFKD", text).lower()
+    text = re.sub(r"[^a-z0-9\s\-\/]", "", text)
+    return " ".join(text.split())
+```
+
 ## Models
 
 This application has three database models, Hospital, School, Library.
@@ -45,10 +63,23 @@ class Hospital(models.Model):
     class Meta:
         verbose_name = "Hospital"
         verbose_name_plural = "Hospitals"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('facility')),
+                name='unique_clean_hospital_facility'
+            )
+        ]
 
     def __str__(self):
         """Return string representation of the model"""
         return f"{self.facility} - {self.address}"
+        
+    def save(self, *args, **kwargs):
+        if self.facility:
+            self.facility = normalize_text(self.facility)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
 ```
 
 ### School
@@ -83,10 +114,23 @@ class School(models.Model):
     class Meta:
         verbose_name = "School"
         verbose_name_plural = "Schools"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('name')),
+                name='unique_clean_school_name'
+            )
+        ]
 
     def __str__(self):
         """Return string representation of the model"""
         return f"{self.name} - {self.address}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = normalize_text(self.name)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
 ```
 
 ### Library
@@ -122,10 +166,121 @@ class Library(models.Model):
     class Meta:
         verbose_name = "Library"
         verbose_name_plural = "Libraries"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('name')),
+                name='unique_clean_library_name'
+            )
+        ]
 
     def __str__(self):
         """Return string representation of the model"""
         return f"{self.name} - {self.address}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = normalize_text(self.name)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
+```
+
+
+* Full `models.py` code
+
+```python
+from django.db import models
+from django.db.models.functions import Lower, Trim
+
+from .utils import normalize_text
+
+
+class Hospital(models.Model):
+    """ Model Class represents each Hospital in Seattle """
+    facility = models.CharField(max_length=250, null=True, default='test')
+    address = models.CharField(max_length=250, null=True, default='test')
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name = "Hospital"
+        verbose_name_plural = "Hospitals"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('facility')),
+                name='unique_clean_hospital_facility'
+            )
+        ]
+
+    def __str__(self):
+        """Return string representation of the model"""
+        return f"{self.facility} - {self.address}"
+        
+    def save(self, *args, **kwargs):
+        if self.facility:
+            self.facility = normalize_text(self.facility)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
+
+
+class School(models.Model):
+    """ Model class represents Private Schools in Seattle """
+    name = models.CharField(max_length=250, null=True, default='test')
+    address = models.CharField(max_length=250, null=True, default='test')
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name = "School"
+        verbose_name_plural = "Schools"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('name')),
+                name='unique_clean_school_name'
+            )
+        ]
+
+    def __str__(self):
+        """Return string representation of the model"""
+        return f"{self.name} - {self.address}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = normalize_text(self.name)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
+
+
+class Library(models.Model):
+    """Model class represents a Library in Seattle"""
+    name = models.CharField(max_length=250, null=True, default='test')
+    address = models.CharField(max_length=250, null=True, default='test')
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name = "Library"
+        verbose_name_plural = "Libraries"
+        constraints = [
+            models.UniqueConstraint(
+                Lower(Trim('name')),
+                name='unique_clean_library_name'
+            )
+        ]
+
+    def __str__(self):
+        """Return string representation of the model"""
+        return f"{self.name} - {self.address}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = normalize_text(self.name)
+        if self.address:
+            self.address = normalize_text(self.address)
+        super().save(*args, **kwargs)
+
 ```
 
 ## Resources
@@ -141,21 +296,50 @@ You can learn more about ModelResource [here](https://django-import-export.readt
 ```python
 from import_export import resources
 from .models import Hospital, School, Library
-
+from .utils import normalize_text
 
 class HospitalResource(resources.ModelResource):
     class Meta:
         model = Hospital
+        exclude = ('id',)
+        import_id_fields = ('facility',)
+        skip_unchanged = True
+        report_skipped = True
+
+    def before_import_row(self, row, **kwargs):
+        if row.get('facility'):
+            row['facility'] = normalize_text(row['facility'])
+        if row.get('address'):
+            row['address'] = normalize_text(row['address'])
+    
 
 
 class SchoolResource(resources.ModelResource):
     class Meta:
         model = School
+        import_id_fields = ('name',)
+        skip_unchanged = True
+        report_skipped = True
+
+    def before_import_row(self, row, **kwargs):
+        if row.get('name'):
+            row['name'] = normalize_text(row['name'])
+        if row.get('address'):
+            row['address'] = normalize_text(row['address'])
 
 
 class LibraryResource(resources.ModelResource):
     class Meta:
         model = Library
+        import_id_field = ('name',)
+        skip_unchanged = True
+        report_skipped = True
+
+    def before_import_row(self, row, **kwargs):
+        if row.get('name'):
+            row['name'] = normalize_text(row['name'])
+        if row.get('address'):
+            row['address'] = normalize_text(row['address'])
 ```
 
 
@@ -252,22 +436,22 @@ urlpatterns = [
     path('map/', views.map_view, name='seattle-map'),
 
     # Importing Data
-    path('import-hospitals/', views.import_hospitals_data, name='import-hospitals'),
-    path('import-schools/', views.import_schools_data, name='import-schools'),
-    path('import-libraries/', views.import_libraries_data, name='import-libraries'),
+    path('import-hospitals/', views.ImportHospitalsView.as_view(), name='import-hospitals'),
+    path('import-schools/', views.ImportSchoolsView.as_view(), name='import-schools'),
+    path('import-libraries/', views.ImportLibrariesView.as_view(), name='import-libraries'),
 
     # Exporting Data
-    path('export-hospitals/', views.export_hospitals_data, name='export-hospitals'),
-    path('export-schools/', views.export_schools_data, name='export-schools'),
-    path('export-libraries/', views.export_libraries_data, name='export-libraries'),
+    path('export-hospitals/', views.HospitalsExportView.as_view(), name='export-hospitals'),
+    path('export-schools/', views.SchoolsExportView.as_view(), name='export-schools'),
+    path('export-libraries/', views.LibrariesExportView.as_view(), name='export-libraries'),
 
 ]
 ```
 
 ## Views
 
-This application has three database models, Hospital, School, Library.
+TODO
 
 ## Templates
 
-This application has three database models, Hospital, School, Library.
+TODO

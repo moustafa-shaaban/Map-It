@@ -209,6 +209,7 @@ __marimo__/
 .idea/
 
 staticfiles/
+media/
 
 node_modules
 .env.local*
