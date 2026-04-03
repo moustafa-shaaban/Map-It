@@ -82,7 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'silk.middleware.SilkyMiddleware',
+    #'silk.middleware.SilkyMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'django_browser_reload.middleware.BrowserReloadMiddleware',
@@ -122,6 +122,7 @@ DATABASES = {
             "init_command": (
                 "PRAGMA foreign_keys=ON;"
                 "PRAGMA journal_mode = WAL;"
+                "PRAGMA wal_autocheckpoint = 1000;"
                 "PRAGMA synchronous = NORMAL;"
                 "PRAGMA busy_timeout = 5000;"
                 "PRAGMA temp_store = MEMORY;"

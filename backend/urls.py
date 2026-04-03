@@ -11,7 +11,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('silk/', include('silk.urls', namespace='silk')),
+    #path('silk/', include('silk.urls', namespace='silk')),
     path(
         "",
         TemplateView.as_view(template_name="index.html"),

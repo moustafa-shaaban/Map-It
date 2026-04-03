@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from import_export.admin import ImportExportModelAdmin
 
 from .models import Hospital, School, Library
@@ -21,6 +20,7 @@ class LibraryAdmin(ImportExportModelAdmin):
     resource_class = LibraryResource
     list_display = ("name", "address", "latitude", "longitude")
     search_fields = ["name", "address"]
+
 
 admin.site.register(Hospital, HospitalAdmin)
 admin.site.register(School, SchoolAdmin)

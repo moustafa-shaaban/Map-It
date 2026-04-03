@@ -10,7 +10,7 @@ This page lists the sturcture of seattle application, and the files used to buil
 
 ## Utils
 
-We start by a very useful util function that will be used to many actions in the project, it's main functionality is to remove some special characters, trim/strip white spaces from text and save strings data in lower-case.
+I start by a very useful util function that will be used to many actions in the project, it's main functionality is to remove some special characters, trim/strip white spaces from text and save strings data in lower-case.
 
 This is useful becuase we need to make sure that the data (facility name for hospitals, and name for schools and libraries) are unique.
 
@@ -20,15 +20,17 @@ import unicodedata
 import re
 
 def normalize_text(text):
-    text = force_str(text or "")
-    text = unicodedata.normalize("NFKD", text).lower()
-    text = re.sub(r"[^a-z0-9\s\-\/]", "", text)
+    """Full normalization for uniqueness. Writen with help from Grok AI"""
+    text = force_str(text or "") # Source: https://docs.djangoproject.com/en/6.0/ref/utils/#django.utils.encoding.force_str
+    text = unicodedata.normalize("NFKD", text).lower() # Lower-case text then emove accents ("café" to "cafe") Source: https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
+    text = re.sub(r"[^a-z0-9\s\-\/]", "", text) # Accept only A to Z + 0 to 9 and dash ( - ) + forward slash ( / )
+    # Collapse multiple whitespace into single space and strip
     return " ".join(text.split())
 ```
 
 ## Models
 
-This application has three database models, Hospital, School, Library.
+This application has three database models, Hospital, School, Library. each model have a database unique constraint on the `facility/name` field to make sure the data is unqiue, and a save method that uses `normalize_text` util on the `facility/name` + `address` fields to noramilze its content.
 
 ### Hospital
 
@@ -45,7 +47,7 @@ In this project we are only interested in 4 columns:
 * `x`: This column represent the latitude of each hospital.
 * `y`: This column represent the longitude of each hospital.
 
-I represented this columns by 4 fields in a Django database model called Hospital
+I represented these columns by 4 fields in a Django model called Hospital
 
 * `facility`: A Character Field with max length of 250 characters, allow null values and a default name value of `test` so it can handle null values (if there are any) in this dataset.
 * `address`: A Character Field with max length of 250 characters, allow null values and a default address value of `test` so it can handle null values (if there are any) in this dataset.
@@ -96,7 +98,7 @@ In this project we are only interested in 4 columns:
 * `x`: This column represent the latitude of each school.
 * `y`: This column represent the longitude of each school.
 
-I represented this columns by 4 fields in a Django database model called School
+I represented these columns by 4 fields in a Django database model called School
 
 * `name`: A Character Field with max length of 250 characters, allow null values and a default name value of `test` so it can handle null values (if there are any) in this dataset.
 * `address`: A Character Field with max length of 250 characters, allow null values and a default address value of `test` so it can handle null values (if there are any) in this dataset.
@@ -289,6 +291,8 @@ This file has three resources that represents database models, these resources w
 
 each resource extends the `ModelResource` of `django-import-export` package.
 
+I exclude the `id` from each model. and each model have a `before_import_row` function that handles normalizing text, before passing the data to preview page so the user can see the data before it is sent to the database.
+
 ::: tip
 You can learn more about ModelResource [here](https://django-import-export.readthedocs.io/en/latest/api_resources.html#modelresource).
 :::
@@ -346,11 +350,12 @@ class LibraryResource(resources.ModelResource):
 
 ## Admin
 
-This file is used to register the database models used for `CRUD` (Create, Read, Update and Delete) actions for each model, and, three classed that extends `ImportExportModelAdmin` from `django-import-export` to add the functionality of importing/exporting data from the Django admin site
+This file is used to register the database models used for `CRUD` (Create, Read, Update and Delete) actions for each model, and, three classed that extends `ImportExportModelAdmin` from `django-import-export` to add the functionality of importing/exporting data from the Django admin site.
+
+I also added the functionality of listing each admin model by all the fields, and searching on each admin model by `facility/name` + `address` fields.
 
 ```python
 from django.contrib import admin
-
 from import_export.admin import ImportExportModelAdmin
 
 from .models import Hospital, School, Library
@@ -359,14 +364,19 @@ from .resources import HospitalResource, SchoolResource, LibraryResource
 
 class HospitalAdmin(ImportExportModelAdmin):
     resource_class = HospitalResource
+    list_display = ("facility", "address", "latitude", "longitude")
+    search_fields = ["facility", "address"]
 
 
 class SchoolAdmin(ImportExportModelAdmin):
     resource_class = SchoolResource
-
+    list_display = ("name", "address", "latitude", "longitude")
+    search_fields = ["name", "address"]
 
 class LibraryAdmin(ImportExportModelAdmin):
     resource_class = LibraryResource
+    list_display = ("name", "address", "latitude", "longitude")
+    search_fields = ["name", "address"]
 
 
 admin.site.register(Hospital, HospitalAdmin)
@@ -376,8 +386,7 @@ admin.site.register(Library, LibraryAdmin)
 
 ## Filters
 
-This file adds filtering functionality for the application that allows users to filter the data by name or address.
-It uses `django-filter` package for filtering data easily. and has base class and three other classes one for each database model.
+This file adds filtering functionality for the application that allows users to filter the data by `name` or `address`.
 
 ```python
 import django_filters
@@ -417,8 +426,6 @@ class HospitalFilter(LocationFilter):
         fields = ['q']
 ```
 
-notice the `HospitalFilter` it filters the data by `facility` instead of `name` like the other two classes.
-
 ## URLS
 
 Currently this application has 8 urls, the first url is for displaying the homepage, the secound is for the map view, and the rest of the urls is for handing data import/export for each model
@@ -447,6 +454,237 @@ urlpatterns = [
 
 ]
 ```
+
+## Forms
+
+Here, there are two forms `UploadFileForm` and `ExportForm`.
+
+### UploadFileForm
+
+This form is used for validating the files that users upload. It has three backend levels of validation:
+
+1. Validating the file extension using Django's bulit-in `FileExtensionValidator`. This makes sure that only three file extensions are allowed (`csv`, `xlsx`, and `json`).
+2. Validating the uploaded file size. This make sure that the user cannot upload a file that is larger than 5MB.
+3. Validating the uoloaded file extension based on it's mime using `python-magic` package. This very important because without it, a malicious user can upload any type of files by just changing its extension, for example, a `file.exe` could be changed to `file.csv` and it will bypass the first validation level (using `FileExtensionValidator`).
+
+There is another validation rule added to the fontend by passing `'accept': '.csv,.xlsx,.json'` attribute as a widget for the form FileField, but we should not rely on it because it can be easily bypassd in the frontend.
+
+
+```python
+from django import forms
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+
+import magic
+
+extension_validators = [
+    'csv',
+    'xlsx',
+    'json'
+]
+
+def validate_file_size(file):
+    max_size = 5 * 1024 * 1024  # 5MB
+    if file.size > max_size:
+        raise ValidationError(f'File exceeded the maximum size. Max size is 5MB.')
+    
+
+def validate_file_type(file):
+    file_content = file.read(4096)
+    file.seek(0)
+    mime = magic.from_buffer(file_content, mime=True)
+    
+    allowed_mimes = [
+        'text/csv', 
+        'application/json',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain',
+        'application/zip',
+    ]
+    if mime not in allowed_mimes:
+        raise ValidationError('The file content does not match the allowed types, (.csv, .xlsx, .json)')
+    
+
+class UploadFileForm(forms.Form):
+    import_file = forms.FileField(
+        label='Select file',
+        validators=[FileExtensionValidator(allowed_extensions=extension_validators), validate_file_size, validate_file_type],
+        widget=forms.FileInput(
+            attrs={
+                'name': 'import_file',
+                'class': 'form-control', 
+                'accept': '.csv,.xlsx,.json',
+            }
+        )
+    )
+```
+
+### ExportForm
+
+A simple form that asks the user to choose the type of the file they want to export, currently it supports only three types of files (csv, xlsx, and json).
+
+## Mixins
+
+Here, there are two reusable mixins used for importing and exporting data using `django-import-export` package. (both `Deepseek` and `Grok` ai helped me a lot im writing these mixins).
+
+### BaseDataImport
+
+This mixin extends Django's built-in `View` class and can be subclassed by four attributes `model`, `template_name`, `resource_class` and `success_url`.
+
+This class have the following functions:
+
+1. `add_success_message` is used to generate success message after importing data. I copied a some of it's actions from the `django-import-export` package. exactly from [here](https://github.com/django-import-export/django-import-export/blob/main/import_export/admin.py). The name of the function is `add_success_message` and is currenntly on line number `259`.
+
+```python
+
+def add_success_message(self, result, request):
+    if not result.has_errors() and result.total_rows == 0:
+        messages.warning(request, _("Import completed, but no records were changed."))
+        return
+    if not self.model:
+        # Fallback if model isn't defined: use a generic name
+        plural_name = "records"
+    else:
+        plural_name = self.model._meta.verbose_name_plural
+    success_message = _(
+        "Import finished: {} new, {} updated, {} deleted and {} skipped {}."
+    ).format(
+        result.totals.get(RowResult.IMPORT_TYPE_NEW, 0),
+        result.totals.get(RowResult.IMPORT_TYPE_UPDATE, 0),
+        result.totals.get(RowResult.IMPORT_TYPE_DELETE, 0),
+        result.totals.get(RowResult.IMPORT_TYPE_SKIP, 0),
+        plural_name,
+    )
+    messages.success(request, success_message)
+
+```
+
+This function counts the number 0f new, updated, deleted or skipped row after confirming data upload.
+
+2. `get_success_url` this function redirects the user to a given url after data import is successful.
+
+```python
+
+def get_success_url(self):
+    return self.success_url
+
+```
+
+3. `get` this function passes the `UploadFileForm` as a context to the template on `GET` requests.
+
+```python
+
+def get(self, request):
+    form = UploadFileForm()
+    return render(request, self.template_name, {'form': form})
+
+```
+
+4. `post`now this function handles the `POST` request that is send to the view, and it has some steps that handle previewing data, canceling import, parsing the uploaded file and finally confirming data import.
+
+```python
+
+def post(self, request):
+    # 1. define the django-import-export resource to use
+    resource = self.resource_class()
+
+    """
+    2. If the user canceled data importing, check if the session have cached data, if the session have data then delete it, and inform the user that the data from the file they uploaded is not mported to the database. Finally redirect the user to the data import page.
+    """
+    if 'cancel_import' in request.POST:
+        if 'import_data_cache' in request.session:
+            del request.session['import_data_cache']
+        messages.info(request, "Import cancelled and temporary data cleared.")
+        return redirect(request.path)
+
+    
+    # 3. If the user confirmed data import, call the `handle_confirmation function.
+    if 'confirm_import' in request.POST:
+        return self.handle_confirmation(request, resource)
+    
+    
+    # 4. Instantiate the UploadFileForm with with the file posted by the user
+    form = UploadFileForm(request.POST, request.FILES)
+
+    """
+    # 5. If the form is valid do the following: 
+        - Get the cleaned file from the form then try to create a tablib dataset by passing the file to the `parse_file` function
+        - Add the data to the user's session so the file is not lost when moving from previewing the data to importing it, this way will make sure that the user does not have to upload the file twice.
+        - create a result using django-import-export resource import_data function and make sure to add (dry_run=True) to tell django-import-export that we are not ready to import the data yet.
+        - Pass the sesult to as a context for the template so the user can preview the data before confirming data import.
+        - If the code failed to add the data to user's session and pass it for previewing, raise and Exception with a message that has the error.
+        - If the form is not valid render the template with form validation errors.
+
+    """
+    if form.is_valid():
+        import_file = form.cleaned_data['import_file']
+        
+        try:
+            dataset = self.parse_file(import_file)
+            
+            request.session['import_data_cache'] = dataset.dict
+            
+            result = resource.import_data(dataset, dry_run=True)
+            return render(request, self.template_name, {
+                'result': result,
+                'form': form
+            })
+        except Exception as e:
+            messages.error(request, f"Parsing error: {str(e)}")
+            return render(request, self.template_name, {'form': form})
+        
+    else:
+        return render(request, self.template_name, {'form': form})
+
+    
+    """
+    6. the parse_file function accepts the uploaded file and checks its extension and based on the result it uses the correct format of the file
+    """
+    def parse_file(self, import_file):
+        dataset = Dataset()
+        extension = import_file.name.split('.')[-1].lower()
+        content = import_file.read()
+        
+        if extension == 'csv':
+            dataset.load(content.decode('utf-8'), format='csv')
+        elif extension == 'xlsx':
+            dataset.load(content, format='xlsx')
+        elif extension == 'json':
+            dataset.load(content.decode('utf-8'), format='json')
+        else:
+            raise ValueError("Unsupported extension.")
+        return dataset
+
+    """
+    7. the handle_confirmation function does the following
+        - Read the data from user's session
+        - see the data that the user selected for import
+        - If there are no data in the seeion or the user did not select any rows return an error and redirect the user to data import page.
+        - If the user selected data rows filter the data in session based on what data the user selected and create a tablib dataset from the filtered data
+        - import the data using django-import-export resource import_data function and this time add (dry_run=False) to import the data into the database.
+        - delete the session data, to make it ready for another data preview/import flow.
+        - add a success message and then redirect the user to the import page.
+    """
+    def handle_confirmation(self, request, resource):
+        import_data = request.session.get('import_data_cache')
+        selected_indices = request.POST.getlist('selected_rows')
+
+        if not import_data or not selected_indices:
+            messages.error(request, "Session expired or no rows selected.")
+            return redirect(request.path)
+
+        filtered_data = [import_data[int(i)] for i in selected_indices]
+        dataset = Dataset()
+        dataset.dict = filtered_data
+        
+        result = resource.import_data(dataset, dry_run=False)
+        del request.session['import_data_cache']
+        self.add_success_message(result, request)
+        return redirect(self.success_url)
+
+```
+
+### BaseDataExport
 
 ## Views
 

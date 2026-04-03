@@ -13,20 +13,10 @@ from import_export.results import RowResult
 from .forms import UploadFileForm, ExportForm
 
 class BaseDataImport(View):
-    """
-    Reusable import view for any model + resource.
-
-    Subclass this and override:
-        - template_name
-        - resource_class
-        - success_redirect_url
-        - import_success_message
-    """
     model = None
     template_name = None
     resource_class = None
     success_url = None
-    import_success_message = "Import completed successfully."
 
     def add_success_message(self, result, request):
         if not result.has_errors() and result.total_rows == 0:

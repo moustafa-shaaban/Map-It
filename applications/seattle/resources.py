@@ -6,6 +6,7 @@ class HospitalResource(resources.ModelResource):
     class Meta:
         model = Hospital
         exclude = ('id',)
+        use_bulk = True
         import_id_fields = ('facility',)
         skip_unchanged = True
         report_skipped = True
@@ -21,7 +22,9 @@ class HospitalResource(resources.ModelResource):
 class SchoolResource(resources.ModelResource):
     class Meta:
         model = School
+        exclude = ("id",)
         import_id_fields = ('name',)
+        use_bulk = True
         skip_unchanged = True
         report_skipped = True
 
@@ -35,7 +38,9 @@ class SchoolResource(resources.ModelResource):
 class LibraryResource(resources.ModelResource):
     class Meta:
         model = Library
+        exclude = ('id',)
         import_id_field = ('name',)
+        use_bulk = True
         skip_unchanged = True
         report_skipped = True
 

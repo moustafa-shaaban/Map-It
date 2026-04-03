@@ -3,7 +3,7 @@ from folium.plugins import MarkerCluster, Fullscreen, LocateControl, Geocoder
 from django.shortcuts import render
 from django.utils.html import escape
 from django.views import generic
-from django.views.generic import TemplateView
+
 # from django.utils.html import escape
 
 from .models import Hospital, School, Library
@@ -103,7 +103,7 @@ def map_view(request):
     return render(request, 'seattle/map.html', context)
 
 
-# class MapView(TemplateView):
+# class MapView(generic.TemplateView):
 #     """Source: ChatGPT"""
 #     template_name = "seattle/map.html"
 

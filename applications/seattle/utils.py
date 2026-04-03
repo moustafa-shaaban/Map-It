@@ -6,9 +6,11 @@ import folium
 from folium.plugins import MarkerCluster
 
 def normalize_text(text):
-    text = force_str(text or "")
-    text = unicodedata.normalize("NFKD", text).lower()
-    text = re.sub(r"[^a-z0-9\s\-\/]", "", text)
+    """Full normalization for uniqueness. Writen with help from Grok AI"""
+    text = force_str(text or "") # Source: https://docs.djangoproject.com/en/6.0/ref/utils/#django.utils.encoding.force_str
+    text = unicodedata.normalize("NFKD", text).lower() # Remove accents from text ("café" to "cafe") Source: https://docs.python.org/3/library/unicodedata.html#unicodedata.normalize
+    text = re.sub(r"[^a-z0-9\s\-\/]", "", text) # Accept only A to Z + 0 to 9 and dash ( - ) + forward slash ( / )
+    # Collapse multiple whitespace into single space and strip
     return " ".join(text.split())
 
 
