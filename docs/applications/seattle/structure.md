@@ -523,6 +523,70 @@ class UploadFileForm(forms.Form):
 
 A simple form that asks the user to choose the type of the file they want to export, currently it supports only three types of files (csv, xlsx, and json).
 
+* Full `forms.py` code
+
+```python
+from django import forms
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+
+import magic
+
+extension_validators = [
+    'csv',
+    'xlsx',
+    'json'
+]
+
+def validate_file_size(file):
+    max_size = 5 * 1024 * 1024  # 5MB
+    if file.size > max_size:
+        raise ValidationError(f'File exceeded the maximum size. Max size is 5MB.')
+    
+
+def validate_file_type(file):
+    file_content = file.read(4096)
+    file.seek(0)
+    mime = magic.from_buffer(file_content, mime=True)
+    
+    allowed_mimes = [
+        'text/csv', 
+        'application/json',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain',
+        'application/zip',
+    ]
+    if mime not in allowed_mimes:
+        raise ValidationError('The file content does not match the allowed types, (.csv, .xlsx, .json)')
+    
+
+class UploadFileForm(forms.Form):
+    import_file = forms.FileField(
+        label='Select file',
+        validators=[FileExtensionValidator(allowed_extensions=extension_validators), validate_file_size, validate_file_type],
+        widget=forms.FileInput(
+            attrs={
+                'name': 'import_file',
+                'class': 'form-control', 
+                'accept': '.csv,.xlsx,.json',
+            }
+        )
+    )
+
+
+class ExportForm(forms.Form):
+    FORMAT_CHOICES = [
+        ('csv', 'Comma Separated Values (CSV)'),
+        ('xlsx', 'Microsoft Excel (XLSX)'),
+        ('json', 'JavaScript Object Notation (JSON)'),
+    ]
+
+    file_format = forms.ChoiceField(
+        choices=FORMAT_CHOICES,
+        label='Choose Format'
+    )
+```
+
 ## Mixins
 
 Here, there are two reusable mixins used for importing and exporting data using `django-import-export` package. (both `Deepseek` and `Grok` ai helped me a lot im writing these mixins).
@@ -686,10 +750,489 @@ def post(self, request):
 
 ### BaseDataExport
 
+This mixin extends Django's built-in `View` class and can be subclassed by three attributes `resource_class`, `filename`, and `template_name`.
+
+This class have the following functions:
+
+1. `get_resource` which is used to pass the django-import-export resource, If no resource is passsed it raises Django `ImproperlyConfigured` exception.
+
+```python
+def get_resource(self):
+    if not self.resource_class:
+        raise ImproperlyConfigured('resource_class is required.')
+    return self.resource_class()
+```
+
+2. `get_queryset` this function will be used when counting the nmber of database records that will be exported.
+
+```python
+def get_queryset(self):
+    raise ImproperlyConfigured('pass a resource_class to extract its queryset.')
+```
+
+3. `get` this function passes the `ExportForm` and the number of database records that will be exported as a context to the template on `GET` requests.
+
+```python
+def get(self, request, *args, **kwargs):
+    form = ExportForm()
+    count = self.get_queryset().count()
+    context = {
+        'form': form,
+        'count': count,
+    }
+    return render(request, self.template_name, context)
+```
+
+4. `post` Now this is the main function that will handle the `POST` request that will be passed to the view. It does the following:
+
+```python
+def post(self, request, *args, **kwargs):
+    # Instantiate the EportForm with the data passed from a POST request
+    form = ExportForm(request.POST)
+
+    # If the form is not valid, rerender the template with validation errors
+    if not form.is_valid():
+        return render(request, self.template_name, {'form': form})
+
+    # Accept the file format that the user defined in the form (either csv, xlsx or json) and clean its data.
+    user_defined_format = form.cleaned_data['format']
+    # Geto both the resource and queryset of the used model
+    resource = self.get_resource()
+    queryset = self.get_queryset()
+
+    # create a dataset based on the resource and queryset of the used model
+    dataset = resource.export(queryset)
+    # Prepare the data for export using the file format that the user defined
+    data = dataset.export(user_defined_format)
+
+    # Initialize a Django HttpResponse with the data that will be exported
+    response = HttpResponse(
+        data,
+        # set the content_type of the response by calling the get_content_type of this class
+        content_type=self.get_content_type(user_defined_format)
+    )
+    """
+    - Define the Content-Disposition http header that will tell the browser that this content will be downloaded to the user's device as an attachment locally, you can read more about this header here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Disposition
+    - Call the get_filename method from this class, which will combine the current data with filename.
+    """
+    response['Content-Disposition'] = (
+        f'attachment; filename="{self.get_filename(user_defined_format)}"'
+    )
+
+    return response
+```
+
+5. `get_filename` This function is used to generate a name of the exported file, it combines three things to generate the name. the file name defined in this class properties, the current data and the user defined file extention.
+
+```python
+def get_filename(self, user_defined_format):
+    date = datetime.now().strftime('%Y-%m-%d')
+    return f'{self.filename}_{date}.{user_defined_format}'
+```
+    
+6. `get_content_type` This function returns the content_type that will be passed to the exported file based on user defined file extention.
+
+```python
+def get_content_type(self, user_defined_format):
+    return {
+        'csv': 'text/csv',
+        'json': 'application/json',
+        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }[user_defined_format]
+```
+
+
+* Full `mixins.py` code
+
+```python
+from datetime import datetime
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from django.views import View
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import gettext as _
+from django.http import HttpResponse
+from tablib import Dataset
+
+from import_export.results import RowResult
+
+from .forms import UploadFileForm, ExportForm
+
+class BaseDataImport(View):
+    model = None
+    template_name = None
+    resource_class = None
+    success_url = None
+
+    def add_success_message(self, result, request):
+        if not result.has_errors() and result.total_rows == 0:
+            messages.warning(request, _("Import completed, but no records were changed."))
+            return
+        if not self.model:
+            # Fallback if model isn't defined: use a generic name
+            plural_name = "records"
+        else:
+            plural_name = self.model._meta.verbose_name_plural
+        success_message = _(
+            "Import finished: {} new, {} updated, {} deleted and {} skipped {}."
+        ).format(
+            result.totals.get(RowResult.IMPORT_TYPE_NEW, 0),
+            result.totals.get(RowResult.IMPORT_TYPE_UPDATE, 0),
+            result.totals.get(RowResult.IMPORT_TYPE_DELETE, 0),
+            result.totals.get(RowResult.IMPORT_TYPE_SKIP, 0),
+            plural_name,
+        )
+        messages.success(request, success_message)
+
+    def get_success_url(self):
+        return self.success_url
+    
+    
+    def get(self, request):
+        form = UploadFileForm()
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request):
+        resource = self.resource_class()
+
+        if 'cancel_import' in request.POST:
+            if 'import_data_cache' in request.session:
+                del request.session['import_data_cache']
+            messages.info(request, "Import cancelled and temporary data cleared.")
+            return redirect(request.path)
+
+        if 'confirm_import' in request.POST:
+            return self.handle_confirmation(request, resource)
+        
+        form = UploadFileForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            import_file = form.cleaned_data['import_file']
+            
+            try:
+                dataset = self.parse_file(import_file)
+                
+                request.session['import_data_cache'] = dataset.dict
+                
+                result = resource.import_data(dataset, dry_run=True)
+                return render(request, self.template_name, {
+                    'result': result,
+                    'form': form
+                })
+            except Exception as e:
+                messages.error(request, f"Parsing error: {str(e)}")
+                return render(request, self.template_name, {'form': form})
+            
+        else:
+            return render(request, self.template_name, {'form': form})
+
+    def parse_file(self, import_file):
+        dataset = Dataset()
+        extension = import_file.name.split('.')[-1].lower()
+        content = import_file.read()
+        
+        if extension == 'csv':
+            dataset.load(content.decode('utf-8'), format='csv')
+        elif extension == 'xlsx':
+            dataset.load(content, format='xlsx')
+        elif extension == 'json':
+            dataset.load(content.decode('utf-8'), format='json')
+        else:
+            raise ValueError("Unsupported extension.")
+        return dataset
+
+    def handle_confirmation(self, request, resource):
+        import_data = request.session.get('import_data_cache')
+        selected_indices = request.POST.getlist('selected_rows')
+
+        if not import_data or not selected_indices:
+            messages.error(request, "Session expired or no rows selected.")
+            return redirect(request.path)
+
+        filtered_data = [import_data[int(i)] for i in selected_indices]
+        dataset = Dataset()
+        dataset.dict = filtered_data
+        
+        result = resource.import_data(dataset, dry_run=False)
+        del request.session['import_data_cache']
+        self.add_success_message(result, request)
+        return redirect(self.success_url)
+    
+
+class BaseDataExport(View):
+    resource_class = None
+    filename = 'export'
+    template_name = 'export.html'
+
+    def get_resource(self):
+        if not self.resource_class:
+            raise ImproperlyConfigured('resource_class is required.')
+        return self.resource_class()
+
+    def get_queryset(self):
+        raise ImproperlyConfigured('pass a resource_class to extract its queryset.')
+
+    def get(self, request, *args, **kwargs):
+        form = ExportForm()
+        count = self.get_queryset().count()
+        context = {
+            'form': form,
+            'count': count,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = ExportForm(request.POST)
+
+        if not form.is_valid():
+            return render(request, self.template_name, {'form': form})
+
+        user_defined_format = form.cleaned_data['file_format']
+        resource = self.get_resource()
+        queryset = self.get_queryset()
+
+        dataset = resource.export(queryset)
+        data = dataset.export(user_defined_format)
+
+        response = HttpResponse(
+            data,
+            content_type=self.get_content_type(user_defined_format)
+        )
+        response['Content-Disposition'] = (
+            f'attachment; filename="{self.get_filename(user_defined_format)}"'
+        )
+
+        return response
+
+    def get_filename(self, user_defined_format):
+        date = datetime.now().strftime('%Y-%m-%d')
+        return f'{self.filename}_{date}.{user_defined_format}'
+
+    def get_content_type(self, user_defined_format):
+        return {
+            'csv': 'text/csv',
+            'json': 'application/json',
+            'xlsx': 'application/svnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }[user_defined_format]
+```
+
 ## Views
 
-TODO
+### HomePage
 
-## Templates
+1. `HomePage` We start with the most simple view, which extends the Django `TemplateView` to return an html file that will be used as the index page of the seattle application
 
-TODO
+```python
+from django.views import generic
+
+class HomePage(generic.TemplateView):
+    """ Class used for displaying website's main page. """
+    template_name = 'seattle/seattle_homepage.html'
+```
+
+### map_view
+2. `map_view` a function-based view that is used to retrieve the data from the `Django database` and display it in a `Folium` map. here is a step by step explanation of what this function (and its related code) does
+
+```python
+
+"""
+    Define the layers that will be added to the map
+    Each layer have the following:
+
+    1. 'model' => the database model that will be used in this layer
+    2. 'filter' => the Django-filter class that will be used in filtering the data in this layer
+    3. 'fields' => the model fileds that will be passed to this layer
+    4. 'icon' => the fontawsome icon name that will be passed to Folium Marker
+    5. 'label' => the label that will be displayed for each layer in Leaflet Layer control
+"""
+LAYERS = [
+    {
+        'model': School,
+        'filter': SchoolFilter,
+        'fields': ('name', 'address'),
+        'icon': {'icon': 'graduation-cap', 'prefix': 'fa'},                 
+        'label': 'Schools'
+    },
+    {
+        'model': Library,
+        'filter': LibraryFilter, 
+        'fields': ('name', 'address'),     
+        'icon': {'icon': 'book', 'prefix': 'fa'},                 
+        'label': 'Libraries'
+    },
+    {
+        'model': Hospital,
+        'filter': HospitalFilter,
+        'fields': ('facility', 'address'), 
+        'icon': {'icon': 'h-square', 'prefix': 'fa', 'color': 'red'}, 
+        'label': 'Hospitals'
+    },
+]
+
+# The default location that the map will center to, the center coordinates of seattle city
+DEFAULT_LOCATION = [47.6062100, -122.3320700]
+# The default zoom that the map will be displayed with, increase the number to zoom-out, or decrease it to zoom-in
+DEFAULT_ZOOM = 11
+
+```
+
+* Here is the main function:
+
+```python
+def map_view(request):
+    # Get the user query that will be used to filter the data using django-filter
+    # strip the text to remove white-spaces and get only the first 100 character to the query
+    query = request.GET.get('q', '').strip()[:100]
+
+    """
+    for each layer in the LAYERS config do the following:
+        1- set the 'queryset' as each layer filter, then pass the request.GET and define the queryset that will be used on each model
+        2- only use the fields defined in each layer fields + the latitude and longitude fields of each model
+        
+        so lets say the model name is School, the filter class is SchoolFilter and the fields that will be used are ('name', 'address'), and so on
+
+        filtered_layers = [
+            { 
+                'queryset': SchoolFilter(
+                    request.GET,
+                    queryset = School.objects.only('latitude', 'longitude', 'name', 'address')
+                ).qs
+            },
+            { 
+                'queryset': LibraryFilter(
+                    request.GET,
+                    queryset = Library.objects.only('latitude', 'longitude', 'name', 'address')
+                ).qs
+            },
+            { 
+                'queryset': HospitalFilter(
+                    request.GET,
+                    queryset = Hospital.objects.only('latitude', 'longitude', 'facility', 'address')
+                ).qs
+            },
+        ]
+    """
+
+    filtered_layers = [
+        {
+            **layer, 
+            'queryset': layer['filter'](
+                request.GET, 
+                queryset=layer['model'].objects.only('latitude', 'longitude', *layer['fields'])
+            ).qs
+        }
+        for layer in LAYERS
+    ]
+
+
+    # Extract all the coordinates for all objects in every layer
+    all_coords = [
+        [obj.latitude, obj.longitude]
+        for layer in filtered_layers
+        for obj in layer['queryset']
+    ]
+
+    # Generate a Folium map, with the default location and zoom, and add a cartodbpositron light tile layer
+    folium_map = folium.Map(
+        location=DEFAULT_LOCATION,
+        tiles='cartodbpositron',
+        zoom_start=DEFAULT_ZOOM,
+        attr='Seattle City'
+    )
+    # Add a another tile layer for a dark map
+    folium.TileLayer('cartodbdark_matter').add_to(folium_map)
+
+    # For each layer in the filtered_layers list use the render_markers from utils.py to add markers to the map
+    for layer in filtered_layers:
+        render_markers(folium_map, layer, layer['queryset'])
+
+    # If there is a filter query and there are data in the database, fit the map bounds to show the filtered data
+    if query and all_coords:
+        folium_map.fit_bounds(all_coords)
+
+    # If these is a filter query but it does not have any data (no data is found that match that query), add a marker to the map with a tooltip that tells the user there are no data that match the query found. then add a Django message that notify the user
+    elif query and not all_coords:
+        folium.Marker(
+            DEFAULT_LOCATION,
+            icon=folium.Icon(color='red', icon='exclamation', prefix='fa'),
+            tooltip='No results found for your search.',
+        ).add_to(folium_map)
+        messages.warning(request, 'No data that match your search were found')
+
+    # Generate a Folium LayerControl and add it to the map
+    folium.LayerControl(position='topright').add_to(folium_map)
+    
+    # Add Folium (Fullscreen, LocateControl, Geocoder and LatLngPopup) plugins to the map
+    Fullscreen().add_to(folium_map)
+    LocateControl().add_to(folium_map)
+    Geocoder().add_to(folium_map)
+    folium.LatLngPopup().add_to(folium_map)
+
+    context = {
+        'map':   folium_map._repr_html_(),
+        # Search query
+        'query': query,
+        # The number of records in the query (if there is any)
+        'count': len(all_coords)
+    }
+    return render(request, 'seattle/map.html', context)
+
+```
+
+### Import/Export views
+
+The following are simple class-based views that extends the Mixins to handle data import/export
+
+```python
+class ImportHospitalsView(BaseDataImport):
+    model = Hospital
+    template_name = "seattle/import_hospitals_data.html"
+    resource_class = HospitalResource
+    success_url = 'seattle:import-hospitals'
+
+
+
+class ImportSchoolsView(BaseDataImport):
+    model = School
+    template_name = "seattle/import_schools_data.html"
+    resource_class = SchoolResource
+    success_url = 'seattle:import-schools'
+
+
+class ImportLibrariesView(BaseDataImport):
+    model = Library
+    template_name = "seattle/import_libraries_data.html"
+    resource_class = LibraryResource
+    success_url = 'seattle:import-libraries'
+
+
+
+
+class HospitalsExportView(BaseDataExport):
+    resource_class = HospitalResource
+    filename = 'hospitals'
+    template_name = "seattle/export_hospitals_data.html"
+
+    def get_queryset(self):
+        return Hospital.objects.all()
+
+
+
+class SchoolsExportView(BaseDataExport):
+    resource_class = SchoolResource
+    filename = 'schools'
+    template_name = "seattle/export_schools_data.html"
+
+    def get_queryset(self):
+        return School.objects.all()
+
+
+
+class LibrariesExportView(BaseDataExport):
+    resource_class = LibraryResource
+    filename = 'libraries'
+    template_name = "seattle/export_libraries_data.html"
+
+    def get_queryset(self):
+        return Library.objects.all()
+```

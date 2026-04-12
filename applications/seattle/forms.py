@@ -53,7 +53,7 @@ class ExportForm(forms.Form):
         ('json', 'JavaScript Object Notation (JSON)'),
     ]
 
-    format = forms.ChoiceField(
+    file_format = forms.ChoiceField(
         choices=FORMAT_CHOICES,
         label='Choose Format'
     )

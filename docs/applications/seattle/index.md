@@ -9,9 +9,9 @@ hero:
     - theme: brand
       text: App Structure
       link: ./structure.md
-    - theme: alt
-      text: Folium
-      link: https://python-visualization.github.io/folium/latest/
+    # - theme: alt
+    #   text: Folium
+    #   link: https://python-visualization.github.io/folium/latest/
 
 features:
   - title: Interactive Web Map
@@ -26,6 +26,7 @@ features:
 
 ::: details
 Libraries and Packages used
+
 * [Django Web Framework](https://www.djangoproject.com/)
 
 * [django-import-export](https://django-import-export.readthedocs.io/en/latest/)
@@ -36,7 +37,6 @@ Libraries and Packages used
 
 :::
 
-### Libraries and Packages used
 
 
 

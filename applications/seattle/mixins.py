@@ -1,7 +1,6 @@
 from datetime import datetime
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from django.contrib import messages
 from django.views import View
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext as _
@@ -124,7 +123,7 @@ class BaseDataExport(View):
         return self.resource_class()
 
     def get_queryset(self):
-        raise NotImplementedError
+        raise ImproperlyConfigured('pass a resource_class to extract its queryset.')
 
     def get(self, request, *args, **kwargs):
         form = ExportForm()
@@ -141,30 +140,30 @@ class BaseDataExport(View):
         if not form.is_valid():
             return render(request, self.template_name, {'form': form})
 
-        fmt = form.cleaned_data['format']
+        user_defined_format = form.cleaned_data['file_format']
         resource = self.get_resource()
         queryset = self.get_queryset()
 
         dataset = resource.export(queryset)
-        data = dataset.export(fmt)
+        data = dataset.export(user_defined_format)
 
         response = HttpResponse(
             data,
-            content_type=self.get_content_type(fmt)
+            content_type=self.get_content_type(user_defined_format)
         )
         response['Content-Disposition'] = (
-            f'attachment; filename="{self.get_filename(fmt)}"'
+            f'attachment; filename="{self.get_filename(user_defined_format)}"'
         )
 
         return response
 
-    def get_filename(self, fmt):
+    def get_filename(self, user_defined_format):
         date = datetime.now().strftime('%Y-%m-%d')
-        return f'{self.filename}_{date}.{fmt}'
+        return f'{self.filename}_{date}.{user_defined_format}'
 
-    def get_content_type(self, fmt):
+    def get_content_type(self, user_defined_format):
         return {
             'csv': 'text/csv',
             'json': 'application/json',
-            'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        }[fmt]
+            'xlsx': 'application/svnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }[user_defined_format]

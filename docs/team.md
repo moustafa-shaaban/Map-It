@@ -23,7 +23,7 @@ const members = [
 <VPTeamPage>
   <VPTeamPageTitle>
     <template #title>
-      Our Team
+      Built By
     </template>
     <!-- <template #lead>
       The development of VitePress is guided by an international
