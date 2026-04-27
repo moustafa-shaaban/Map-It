@@ -1,18 +1,111 @@
 # models.py
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.urls import reverse
+
+from applications.seattle.utils import normalize_text
 
 
-# class Country(models.Model):
-#     code = models.CharField(max_length=2, unique=True, db_index=True)
-#     name = models.CharField(max_length=100, unique=True)
+class Category(models.Model):
+    """Model definition for Category."""
 
-#     class Meta:
-#         verbose_name_plural = "countries"
-#         ordering = ["name"]
+    name = models.CharField(max_length=50)
 
-#     def __str__(self):
-#         return f"{self.name} ({self.code})"
+    class Meta:
+        """Meta definition for Category."""
+
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        """Unicode representation of Category."""
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.name:
+            self.name = normalize_text(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """Return absolute url for Category."""
+        return reverse('category-detail', kwargs={'pk': self.pk})
+
+
+class Tag(models.Model):
+    """Model definition for Tag."""
+
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        """Meta definition for Tag."""
+
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+
+    def __str__(self):
+        """Unicode representation of Tag."""
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        """Save method for Tag."""
+        if self.name:
+            self.name = normalize_text(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """Return absolute url for Tag."""
+        return reverse('tag-detail', kwargs={'pk': self.pk})
+    
+
+class Place(models.Model):
+    """Model definition for Place."""
+
+    name = models.CharField(max_length=250)
+    description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag)
+    rating = models.DecimalField(
+        max_digits=2, decimal_places=1,
+        validators=[MinValueValidator(1.0), MaxValueValidator(5.0)]
+    )
+    phone = models.CharField(max_length=30)
+    website = models.URLField()
+    review_count = models.PositiveIntegerField(default=0)
+    verified = models.BooleanField(default=False, db_index=True)
+    latitude  = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta definition for Place."""
+
+        verbose_name = 'Place'
+        verbose_name_plural = 'Places'
+        ordering = ["-rating", "-review_count"]
+        indexes = [
+            
+            models.Index(fields=["category"]),
+            models.Index(fields=["latitude", "longitude"]),
+        ]
+
+    def __str__(self):
+        """Unicode representation of Place."""
+        return f"{self.name} - ({self.category}) - ({self.rating})"
+
+    def save(self, *args, **kwargs):
+        """Save method for Tag."""
+        if self.name:
+            self.name = normalize_text(self.name)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """Return absolute url for Place."""
+        return reverse('place-detail', kwargs={'pk': self.pk})
+
+
+
 
 
 # class Place(models.Model):
@@ -56,25 +149,3 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 #     def __str__(self):
 #         return f"{self.name} ({self.type}) — {self.city}"
 
-
-# class OpeningHours(models.Model):
-#     class DayGroup(models.TextChoices):
-#         ALL_WEEK = "all_week", "All Week"
-#         WEEKDAYS = "weekdays", "Weekdays Only"
-#         WEEKENDS = "weekends", "Weekends Only"
-#         CUSTOM = "custom", "Custom"
-
-#     place = models.OneToOneField(Place, on_delete=models.CASCADE, related_name="opening_hours")
-#     open_time = models.TimeField(null=True, blank=True)   # null = open 24h
-#     close_time = models.TimeField(null=True, blank=True)   # null = open 24h
-#     is_24_7 = models.BooleanField(default=False)
-#     days = models.CharField(max_length=20, choices=DayGroup.choices, default=DayGroup.ALL_WEEK)
-#     note = models.CharField(max_length=100, blank=True)
-
-#     class Meta:
-#         verbose_name_plural = "opening hours"
-
-#     def __str__(self):
-#         if self.is_24_7:
-#             return f"{self.place.name}: 24/7"
-#         return f"{self.place.name}: {self.open_time}–{self.close_time}"
