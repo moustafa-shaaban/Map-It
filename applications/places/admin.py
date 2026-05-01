@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from django.db.models import Q
 
-from .models import Category, Tag, Place
+from .models import Type, Tag, Place
 
 
 class RatingFilter(admin.SimpleListFilter):
@@ -27,8 +27,8 @@ class RatingFilter(admin.SimpleListFilter):
             )
         return queryset
 
-class CategoryAdmin(admin.ModelAdmin):
-    model = Category
+class TypeAdmin(admin.ModelAdmin):
+    model = Type
     search_fields = ["name"]
 
 class TagAdmin(admin.ModelAdmin):
@@ -38,11 +38,11 @@ class TagAdmin(admin.ModelAdmin):
 
 class PlaceAdmin(admin.ModelAdmin):
     model = Place
-    list_display = ("name", "category", "rating", "review_count", "latitude", "longitude")
-    list_filter = ("category", "tags", RatingFilter, "verified")
+    list_display = ("name", "type", "rating", "review_count", "latitude", "longitude", "created_at")
+    list_filter = ("type", "tags", RatingFilter, "verified")
     search_fields = ["name"]
 
 
-admin.site.register(Category, CategoryAdmin)
+admin.site.register(Type, TypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Place, PlaceAdmin)

@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from applications.places.models import Category, Place, Tag
-from applications.places.factories import PlaceFactory, CategoryFactory, TagFactory
+from applications.places.models import Type, Place, Tag
+from applications.places.factories import PlaceFactory, TypeFactory, TagFactory
 
 class Command(BaseCommand):
     help = 'Populate the database with realistic test data using Faker and Factory Boy'
@@ -42,12 +42,12 @@ class Command(BaseCommand):
         if clear:
             self.stdout.write(self.style.WARNING('Clearing existing data...'))
             Place.objects.all().delete()
-            Category.objects.all().delete()
+            Type.objects.all().delete()
             Tag.objects.all().delete()
             self.stdout.write(self.style.SUCCESS('Data cleared!'))
 
         self.stdout.write('Creating categories...')
-        categories = CategoryFactory.create_batch(categories_count)
+        categories = TypeFactory.create_batch(categories_count)
         self.stdout.write(self.style.SUCCESS(f'Created {len(categories)} categories'))
 
         self.stdout.write('Creating tags...')
@@ -66,6 +66,6 @@ class Command(BaseCommand):
         
         # Display some statistics
         self.stdout.write('\n--- Database Statistics ---')
-        self.stdout.write(f'Categories: {Category.objects.count()}')
+        self.stdout.write(f'Categories: {Type.objects.count()}')
         self.stdout.write(f'Tags: {Tag.objects.count()}')
         self.stdout.write(f'Places: {Place.objects.count()}')

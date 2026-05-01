@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Places{% endblock %}
+
+{% block styles %}
+<style>
+  .map-container {
+    height: 550px;
+    width: 100%;
+  }
+
+  .popup-content {
+    min-width: 220px;
+    line-height: 1.5;
+  }
+
+  [v-cloak] {
+    display: none;
+  }
+
+  .popup-card {
+    font-family: system-ui, sans-serif;
+    min-width: 220px;
+    max-width: 280px;
+    padding: 10px;
+  }
+
+  .popup-header {
+    margin-bottom: 6px;
+  }
+
+  .popup-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .popup-type {
+    display: inline-block;
+    font-size: 12px;
+    color: #666;
+  }
+
+  .popup-body {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #444;
+  }
+
+  .popup-coords {
+    margin: 0;
+    font-size: 12px;
+    color: #888;
+  }
+
+  .popup-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .popup-actions .btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+</style>
+{% endblock styles %}
+
+{% block content %}
+<div id="app" v-cloak>
+
+  <div class="modal fade" id="placeModal" tabindex="-1" ref="modalElement">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" v-if="selectedPlace">
+        <div class="modal-header">
+          <h5 class="modal-title">[[ selectedPlace.name || 'Place Details' ]]</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <h5 class="card-header">Type: [[ selectedPlace.type?.name || '—' ]]</h5>
+            <div class="card-body">
+              <p class="card-text">
+                [[ selectedPlace.verified ? 'Verified' : 'Not Verified' ]]
+              </p>
+              <h5 class="card-title">Rating: [[ selectedPlace.rating || '—' ]] / Reviews: [[ selectedPlace.review_count ]]</h5>
+              <p class="card-text">
+                Tags:
+                <span v-for="tag in selectedPlace.tags" :key="tag.id" class="badge rounded-pill text-bg-primary">[[ tag.name ]]</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a :href="safeUrl(selectedPlace.detail_url)" target="_blank" rel="noopener noreferrer"
+            class="btn btn-primary">
+            View Full Details
+          </a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-2">
+    <div class="row">
+      <div class="col-md-9">
+        <span><strong>Found:</strong> [[ count ]] places</span>
+        <div id="map" class="map-container"></div>
+      </div>
+      <div class="col-md-3">
+        <div class="mt-2">
+          <form @submit.prevent="loadPlaces" id="filter-form">
+            <div class="row">
+              {{ filter.form.search|as_crispy_field }}
+            </div>
+            <div class="row">
+              {{ filter.form.name|as_crispy_field }}
+            </div>
+            <div class="row">
+              {{ filter.form.verified|as_crispy_field }}
+            </div>
+            <div class="row">
+              {{ filter.form.type|as_crispy_field }}
+            </div>
+            <div class="row">
+              {{ filter.form.tags|as_crispy_field }}
+            </div>
+            <div class="row">
+              <div class="col">
+                {{ filter.form.rating_min|as_crispy_field }}
+              </div>
+              <div class="col">
+                {{ filter.form.rating_max|as_crispy_field }}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col">
+                {{ filter.form.review_count_min|as_crispy_field }}
+              </div>
+              <div class="col">
+                {{ filter.form.review_count_max|as_crispy_field }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+            <button type="button" @click="resetFilters" class="btn btn-secondary">Reset</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const { createApp, ref, onMounted, nextTick, watch } = Vue;
+
+  function safeUrl(url) {
+    try {
+      const parsedURL = new URL(url, window.location.origin);
+
+      const isHttp = ['http:', 'https:'].includes(parsedURL.protocol);
+      const isSameOrigin = parsedURL.origin === window.location.origin;
+
+      return isHttp && isSameOrigin ? parsedURL.href : '#';
+    } catch {
+      return '#';
+    }
+  }
+
+  function buildCopyBtn(lat, lng) {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm btn-outline-secondary ms-2';
+    btn.textContent = 'Copy Coordinates';
+    btn.type = 'button';
+
+    btn.addEventListener('click', async () => {
+      const safeLat = parseFloat(lat);
+      const safeLng = parseFloat(lng);
+
+      if (isNaN(safeLat) || isNaN(safeLng)) {
+        btn.textContent = 'Invalid coordinates';
+        return;
+      }
+
+      const coords = `${safeLat}, ${safeLng}`;
+
+      try {
+        await navigator.clipboard.writeText(coords);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Coordinates Copied",
+          showConfirmButton: false,
+          timer: 2000
+      })
+      } catch (err) {
+        console.error('Clipboard write failed:', err);
+        Swal.fire("Copy Failed, Rty again")
+      } finally {
+        setTimeout(() => { btn.textContent = 'Copy Coordinates'; }, 2000);
+      }
+    });
+
+    return btn;
+  }
+
+  function buildPopupNode(place, onMoreInfo) {
+    const container = document.createElement('div');
+    container.className = 'popup-card';
+
+    const header = document.createElement('div');
+    header.className = 'popup-header';
+
+    const title = document.createElement('h6');
+    title.className = 'popup-title';
+    title.textContent = place.name || 'Unknown';
+
+    const type = document.createElement('span');
+    type.className = 'popup-type';
+    type.textContent = place.type?.name || '—';
+
+    header.append(title, type);
+
+    const body = document.createElement('div');
+    body.className = 'popup-body';
+
+    const coords = document.createElement('p');
+    coords.className = 'popup-coords';
+    coords.textContent = `${place.latitude}, ${place.longitude}`;
+
+    body.append(coords);
+
+    const actions = document.createElement('div');
+    actions.className = 'popup-actions';
+
+    const btnInfo = document.createElement('button');
+    btnInfo.className = 'btn btn-primary btn-sm';
+    btnInfo.textContent = 'More Info';
+    btnInfo.addEventListener('click', onMoreInfo);
+
+    const btnDetail = document.createElement('a');
+    btnDetail.className = 'btn btn-outline-primary btn-sm';
+    btnDetail.textContent = 'Details';
+    btnDetail.target = '_blank';
+    btnDetail.rel = 'noopener noreferrer';
+    btnDetail.href = safeUrl(place.detail_url);
+
+    const btnCopy = buildCopyBtn(place.latitude, place.longitude);
+
+    actions.append(btnInfo, btnDetail, btnCopy);
+
+    container.append(header, body, actions);
+    return container;
+  }
+
+
+  createApp({
+    delimiters: ['[[', ']]'],
+    setup() {
+      const count = ref(0);
+      const loading = ref(true);
+      const error = ref(null);
+      const selectedPlace = ref(null);
+      const modalElement = ref(null);
+
+      let bsModal = null;
+      let map = null;
+      let markersCluster = null;
+
+      const showPlaceModal = (place) => {
+        selectedPlace.value = place;
+        bsModal.show();
+      };
+
+      const initMap = () => {
+        map = L.map('map').setView([30, 30], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'
+        }).addTo(map);
+        markersCluster = L.markerClusterGroup();
+        map.addLayer(markersCluster);
+      };
+
+      const loadPlaces = async () => {
+        loading.value = true;
+        error.value = null;
+
+        const params = new URLSearchParams(
+          new FormData(document.getElementById('filter-form'))
+        ).toString();
+
+        try {
+          const res = await fetch(`/places/api/places/?${params}`);
+          if (!res.ok) throw new Error(`Server error: ${res.status}`);
+          const data = await res.json();
+
+          console.log(data.places[0])
+
+          count.value = data.count;
+          markersCluster.clearLayers();
+          const bounds = L.latLngBounds([]);
+
+          data.places.forEach(place => {
+            const lat = parseFloat(place.latitude);
+            const lng = parseFloat(place.longitude);
+            if (isNaN(lat) || isNaN(lng)) return;
+
+            const marker = L.marker([lat, lng]);
+            marker.bindPopup(buildPopupNode(place, () => showPlaceModal(place)));
+            markersCluster.addLayer(marker);
+            bounds.extend([lat, lng]);
+          });
+
+          if (bounds.isValid()) {
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16, animate: true });
+          } else {
+            map.setView([30, 30], 2);
+          }
+        } catch (err) {
+          error.value = 'Failed to load map data.';
+          console.error(err);
+        } finally {
+          loading.value = false;
+        }
+      };
+
+      const resetFilters = () => {
+        document.getElementById('filter-form').reset();
+        loadPlaces();
+      };
+
+      watch(loading, (isLoading) => {
+        if (isLoading) {
+          Swal.fire({
+            title: 'Loading places...',
+            theme: 'auto',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading(),
+          });
+        } else {
+          Swal.close();
+        }
+      }, { immediate: true });
+
+      onMounted(async () => {
+        bsModal = new bootstrap.Modal(modalElement.value);
+        initMap();
+        await nextTick();
+        map.invalidateSize();
+        loadPlaces();
+      });
+
+      return {
+        count, loading, error, selectedPlace, modalElement,
+        safeUrl, loadPlaces, resetFilters,
+      };
+    },
+  }).mount('#app');
+</script>
+{% endblock %}

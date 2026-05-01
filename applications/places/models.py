@@ -1,24 +1,24 @@
-# models.py
 from django.db import models
+from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 
 from applications.seattle.utils import normalize_text
 
 
-class Category(models.Model):
-    """Model definition for Category."""
+class Type(models.Model):
+    """Model definition for Type."""
 
     name = models.CharField(max_length=50)
 
     class Meta:
-        """Meta definition for Category."""
+        """Meta definition for Type."""
 
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'Type'
+        verbose_name_plural = 'Type'
 
     def __str__(self):
-        """Unicode representation of Category."""
+        """Unicode representation of Type."""
         return f"{self.name}"
 
     def save(self, *args, **kwargs):
@@ -27,8 +27,8 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        """Return absolute url for Category."""
-        return reverse('category-detail', kwargs={'pk': self.pk})
+        """Return absolute url for Type."""
+        return reverse('type-detail', kwargs={'pk': self.pk})
 
 
 class Tag(models.Model):
@@ -62,11 +62,11 @@ class Place(models.Model):
 
     name = models.CharField(max_length=250)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     rating = models.DecimalField(
         max_digits=2, decimal_places=1,
-        validators=[MinValueValidator(1.0), MaxValueValidator(5.0)]
+        validators=[MinValueValidator(Decimal(1.0)), MaxValueValidator(Decimal(5.0))]
     )
     phone = models.CharField(max_length=30)
     website = models.URLField()
@@ -86,66 +86,14 @@ class Place(models.Model):
         ordering = ["-rating", "-review_count"]
         indexes = [
             
-            models.Index(fields=["category"]),
+            models.Index(fields=["type"]),
             models.Index(fields=["latitude", "longitude"]),
         ]
 
     def __str__(self):
         """Unicode representation of Place."""
-        return f"{self.name} - ({self.category}) - ({self.rating})"
-
-    def save(self, *args, **kwargs):
-        """Save method for Tag."""
-        if self.name:
-            self.name = normalize_text(self.name)
-        super().save(*args, **kwargs)
+        return f"{self.name} - ({self.type}) - ({self.rating})"
 
     def get_absolute_url(self):
         """Return absolute url for Place."""
         return reverse('place-detail', kwargs={'pk': self.pk})
-
-
-
-
-
-# class Place(models.Model):
-
-#     class PlaceType(models.TextChoices):
-#         HOSPITAL   = "Hospital", "Hospital"
-#         PARK       = "Park", "Park"
-#         SCHOOL     = "School", "School"
-#         RESTAURANT = "Restaurant", "Restaurant"
-#         HOTEL      = "Hotel", "Hotel"
-#         MUSEUM     = "Museum", "Museum"
-
-#     name = models.CharField(max_length=200, db_index=True)
-#     address = models.TextField()
-#     city = models.CharField(max_length=100, db_index=True)
-#     country = models.ForeignKey(Country, on_delete=models.PROTECT, related_name="places")
-#     type = models.CharField(max_length=20, choices=PlaceType.choices, db_index=True)
-
-#     latitude = models.DecimalField(max_digits=9, decimal_places=6)
-#     longitude = models.DecimalField(max_digits=9, decimal_places=6)
-
-#     rating = models.DecimalField(
-#         max_digits=2, decimal_places=1,
-#         validators=[MinValueValidator(1.0), MaxValueValidator(5.0)]
-#     )
-#     review_count = models.PositiveIntegerField(default=0)
-
-#     phone = models.CharField(max_length=30, blank=True)
-#     verified = models.BooleanField(default=False, db_index=True)
-
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-
-#     class Meta:
-#         ordering = ["-rating", "-review_count"]
-#         indexes = [
-#             models.Index(fields=["type", "country"]),
-#             models.Index(fields=["latitude", "longitude"]),
-#         ]
-
-#     def __str__(self):
-#         return f"{self.name} ({self.type}) — {self.city}"
-
