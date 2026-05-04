@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Places{% endblock %}
+
+{% block styles %}
+<style>
+    .map-container {
+        height: 550px;
+        width: 100%;
+    }
+
+    .popup-card {
+        font-family: system-ui, sans-serif;
+        min-width: 220px;
+        max-width: 280px;
+        padding: 10px;
+    }
+
+    .popup-header {
+        margin-bottom: 6px;
+    }
+
+    .popup-title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .popup-type {
+        display: inline-block;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .popup-body {
+        font-size: 13px;
+        margin-bottom: 8px;
+        color: #444;
+    }
+
+    .popup-coords {
+        margin: 0;
+        font-size: 12px;
+        color: #888;
+    }
+
+    .popup-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .popup-actions .btn {
+        flex: 1 1 auto;
+        text-align: center;
+        padding: 4px 6px;
+        font-size: 12px;
+    }
+</style>
+{% endblock styles %}
+
+{% block content %}
+
+<div class="modal fade" id="placeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Place Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <h5 class="card-header" id="modal-type"></h5>
+                    <div class="card-body">
+                        <p class="card-text" id="modal-verified"></p>
+                        <h5 class="card-title" id="modal-rating"></h5>
+                        <p class="card-text">
+                            Tags: <span id="modal-tags"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modal-detail-link" href="#" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-primary">View Full Details</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-2">
+    <div class="row">
+        <div class="col-md-9">
+            <span><strong>Found:</strong> <span id="places-count">0</span> places</span>
+            <div id="map" class="map-container"></div>
+        </div>
+        <div class="col-md-3">
+            <div class="mt-2">
+                <form id="filter-form">
+                    <div class="row">{{ filter.form.search|as_crispy_field }}</div>
+                    <div class="row">{{ filter.form.name|as_crispy_field }}</div>
+                    <div class="row">{{ filter.form.verified|as_crispy_field }}</div>
+                    <div class="row">{{ filter.form.type|as_crispy_field }}</div>
+                    <div class="row">{{ filter.form.tags|as_crispy_field }}</div>
+                    <div class="row">
+                        <div class="col">{{ filter.form.rating_min|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.rating_max|as_crispy_field }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">{{ filter.form.review_count_min|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.review_count_max|as_crispy_field }}</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <button type="button" id="reset-btn" class="btn btn-secondary">Reset</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── State ────────────────────────────────────────────────────────────────
+  let map = null;
+  let markersCluster = null;
+  let bsModal = null;
+  let selectedPlace = null;
+
+  // ── DOM refs ─────────────────────────────────────────────────────────────
+  const countEl = document.getElementById('places-count');
+  const modalEl = document.getElementById('placeModal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalType = document.getElementById('modal-type');
+  const modalVerif = document.getElementById('modal-verified');
+  const modalRating = document.getElementById('modal-rating');
+  const modalTags = document.getElementById('modal-tags');
+  const modalLink = document.getElementById('modal-detail-link');
+  const filterForm = document.getElementById('filter-form');
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function safeUrl(url) {
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return ['http:', 'https:'].includes(parsed.protocol) &&
+             parsed.origin === window.location.origin
+        ? parsed.href
+        : '#';
+    } catch {
+      return '#';
+    }
+  }
+
+  function showLoading() {
+    Swal.fire({
+      title: 'Loading places…',
+      theme: 'auto',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => Swal.showLoading(),
+    });
+  }
+
+  function hideLoading() {
+    Swal.close();
+  }
+
+  // ── Modal population ──────────────────────────────────────────────────────
+  function populateModal(place) {
+    modalTitle.textContent  = place.name || 'Place Details';
+    modalType.textContent   = 'Type: ' + (place.type?.name || '—');
+    modalVerif.textContent  = place.verified ? 'Verified' : 'Not Verified';
+    modalRating.textContent =
+      'Rating: ' + (place.rating || '—') + ' / Reviews: ' + place.review_count;
+
+    // Clear old tags then rebuild without innerHTML
+    while (modalTags.firstChild) {
+      modalTags.removeChild(modalTags.firstChild);
+    }
+    (place.tags || []).forEach(function (tag) {
+      const badge = document.createElement('span');
+      badge.className   = 'badge rounded-pill text-bg-primary';
+      badge.textContent = tag.name;
+      modalTags.appendChild(badge);
+    });
+
+    modalLink.href = safeUrl(place.detail_url);
+  }
+
+  function showPlaceModal(place) {
+    selectedPlace = place;
+    populateModal(place);
+    bsModal.show();
+  }
+
+  // ── Copy-coordinates button ───────────────────────────────────────────────
+  function buildCopyBtn(lat, lng) {
+    const btn   = document.createElement('button');
+    btn.className   = 'btn btn-sm btn-outline-secondary ms-2';
+    btn.textContent = 'Copy Coordinates';
+    btn.type        = 'button';
+
+    btn.addEventListener('click', async function () {
+      const safeLat = parseFloat(lat);
+      const safeLng = parseFloat(lng);
+
+      if (isNaN(safeLat) || isNaN(safeLng)) {
+        btn.textContent = 'Invalid coordinates';
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(safeLat + ', ' + safeLng);
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Coordinates Copied',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } catch (err) {
+        console.error('Clipboard write failed:', err);
+        Swal.fire('Copy Failed, try again');
+      } finally {
+        setTimeout(function () { btn.textContent = 'Copy Coordinates'; }, 2000);
+      }
+    });
+
+    return btn;
+  }
+
+  // ── Popup node builder ────────────────────────────────────────────────────
+  function buildPopupNode(place, onMoreInfo) {
+    const container = document.createElement('div');
+    container.className = 'popup-card';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'popup-header';
+
+    const title = document.createElement('h6');
+    title.className   = 'popup-title';
+    title.textContent = place.name || 'Unknown';
+
+    const type = document.createElement('span');
+    type.className   = 'popup-type';
+    type.textContent = place.type?.name || '—';
+
+    header.appendChild(title);
+    header.appendChild(type);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'popup-body';
+
+    const coords = document.createElement('p');
+    coords.className   = 'popup-coords';
+    coords.textContent = place.latitude + ', ' + place.longitude;
+
+    body.appendChild(coords);
+
+    // Actions
+    const actions = document.createElement('div');
+    actions.className = 'popup-actions';
+
+    const btnInfo = document.createElement('button');
+    btnInfo.className   = 'btn btn-primary btn-sm';
+    btnInfo.textContent = 'More Info';
+    btnInfo.addEventListener('click', onMoreInfo);
+
+    const btnDetail = document.createElement('a');
+    btnDetail.className   = 'btn btn-outline-primary btn-sm';
+    btnDetail.textContent = 'Details';
+    btnDetail.target      = '_blank';
+    btnDetail.rel         = 'noopener noreferrer';
+    btnDetail.href        = safeUrl(place.detail_url);
+
+    const btnCopy = buildCopyBtn(place.latitude, place.longitude);
+
+    actions.appendChild(btnInfo);
+    actions.appendChild(btnDetail);
+    actions.appendChild(btnCopy);
+
+    container.appendChild(header);
+    container.appendChild(body);
+    container.appendChild(actions);
+
+    return container;
+  }
+
+  // ── Map initialisation ────────────────────────────────────────────────────
+  function initMap() {
+    map = L.map('map').setView([30, 30], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution:
+        '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team ' +
+        'hosted by OpenStreetMap France',
+    }).addTo(map);
+    markersCluster = L.markerClusterGroup();
+    map.addLayer(markersCluster);
+  }
+
+  // ── Load / filter places ──────────────────────────────────────────────────
+  async function loadPlaces() {
+    showLoading();
+
+    const params = new URLSearchParams(
+      new FormData(filterForm)
+    ).toString();
+
+    try {
+      const res = await fetch('/places/api/places/?' + params);
+      if (!res.ok) throw new Error('Server error: ' + res.status);
+      const data = await res.json();
+
+      countEl.textContent = data.count;
+      markersCluster.clearLayers();
+
+      const bounds = L.latLngBounds([]);
+
+      data.places.forEach(function (place) {
+        const lat = parseFloat(place.latitude);
+        const lng = parseFloat(place.longitude);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        const marker = L.marker([lat, lng]);
+        marker.bindPopup(
+          buildPopupNode(place, function () { showPlaceModal(place); })
+        );
+        markersCluster.addLayer(marker);
+        bounds.extend([lat, lng]);
+      });
+
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16, animate: true });
+      } else {
+        map.setView([30, 30], 2);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  function resetFilters() {
+    filterForm.reset();
+    loadPlaces();
+  }
+
+  // ── Bootstrap ─────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function () {
+    bsModal = new bootstrap.Modal(modalEl);
+    initMap();
+
+    requestAnimationFrame(function () {
+      map.invalidateSize();
+      loadPlaces();
+    });
+
+    filterForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      loadPlaces();
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', resetFilters);
+  });
+
+}());
+</script>
+
+{% endblock %}
