@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    {{ place.name }}
+{% endblock title %}
+    
+
+{% block content %}
+    <div class="container p-5 mt-4 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+            <div class="row flex justify-items-center align-items-center">
+                <div class="col">
+                    <h1 class="display-5 fw-bold">{{ place.name }}</h1>
+                </div>
+                {% if place.verified %}
+                    <div class="col">
+                        Verified <i class="bi bi-patch-check-fill"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    Category: {{ place.type.name.capitalize }}
+                </div>
+                <hr>
+                <div class="col">
+                    Tags: 
+                    {% for tag in place.tags.all %}
+                        <span class="badge rounded-pill text-bg-primary">{{ tag.name.capitalize }}</span>
+                        {% empty %}
+                        <span class="badge rounded-pill text-bg-secondary">
+                            No tags
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+                
+            <p class="col-md-8 fs-4">
+                Description: {{ place.description }}
+            </p> 
+
+            <p>Website: {{ place.website }} - Phone Number: {{ place.phone }}</p>
+
+            <p>Rating: {{ place.rating }} - Number 0f Reviews: {{ place.review_count }}</p>
+
+            <button class="btn btn-primary btn-lg" type="button">Example button</button>
+        </div>
+    </div>
+{% endblock content %}
+    

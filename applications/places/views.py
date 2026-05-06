@@ -29,4 +29,4 @@ def map_view(request):
 
 class PlaceDetailView(DetailView):
     model = Place
-    template_name = 'place-detail.html'
+    template_name = 'place_detail.html'
