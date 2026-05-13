@@ -53,11 +53,9 @@
                 Places
               </a>
               <ul class="dropdown-menu">
-                {% comment %}
-                <li><a class="dropdown-item" href="{% url 'places:seattle-homepage' %}">App Home</a></li>
-                {% endcomment %}
+                <li><a class="dropdown-item" href="{% url 'places:place-list-view' %}">Places</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'places:places-list' %}">Map</a></li>
+                <li><a class="dropdown-item" href="{% url 'places:places-map' %}">Map</a></li>
               </ul>
             </li>
             {% endif %}

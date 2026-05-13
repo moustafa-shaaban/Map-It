@@ -5,7 +5,8 @@ from . import views
 app_name = 'places'
 
 urlpatterns = [
-    path("", views.map_view, name='places-list'),
+    path("", views.map_view, name='places-map'),
     path('api/places/', views.places_list, name='places-api'),
+    path('places/', views.PlacesListView.as_view(), name='place-list-view'),
     path('api/places/<int:pk>', views.PlaceDetailView.as_view(), name='place-detail-view'),
 ]

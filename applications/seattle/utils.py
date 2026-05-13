@@ -1,8 +1,8 @@
 import unicodedata
 import re
 from django.utils.encoding import force_str
-from django.utils.html import escape
 from django.utils.text import slugify
+from django.utils.html import escape
 import folium
 from folium.plugins import MarkerCluster
 

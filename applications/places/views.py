@@ -27,6 +27,15 @@ def map_view(request):
     }
     return render(request, 'places_list.html', context)
 
+
+class PlacesListView(ListView):
+    model = Place
+    context_object_name = 'places'
+    paginate_by = 10
+    template_name = 'places.html'
+
+
+
 class PlaceDetailView(DetailView):
     model = Place
     template_name = 'place_detail.html'
