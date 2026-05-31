@@ -1,9 +1,30 @@
 from django.db import models
-from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
+from django.utils.encoding import force_str
+from django.utils.text import slugify
+from django.conf import settings
 
-from applications.seattle.utils import normalize_text
+def normalize_text(text, allow_unicode=False):
+    """
+    Enhanced normalization for uniqueness and security.
+    """
+    text = force_str(text or "")
+    
+    # 1. Handle Unicode: If allow_unicode is False, it converts 'café' to 'cafe'
+    # Django's slugify handles the NFKD normalization and stripping of non-ascii 
+    # more robustly than a manual re.sub.
+    text = slugify(text, allow_unicode=allow_unicode)
+    
+    # 2. Manual refinements (if you specifically need / and spaces preserved)
+    # Note: slugify replaces spaces with dashes. If you want spaces, 
+    # we swap them back.
+    text = text.replace('-', ' ')
+    
+    # 3. Security: Prevent "Hidden" characters
+    # Some unicode characters look like spaces but aren't. 
+    # .split() handles all whitespace types (tabs, newlines, etc.)
+    return " ".join(text.split()).lower().strip()
 
 
 class Type(models.Model):
@@ -64,13 +85,8 @@ class Place(models.Model):
     description = models.TextField()
     type = models.ForeignKey(Type, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    rating = models.DecimalField(
-        max_digits=2, decimal_places=1,
-        validators=[MinValueValidator(Decimal(1.0)), MaxValueValidator(Decimal(5.0))]
-    )
     phone = models.CharField(max_length=30)
     website = models.URLField()
-    review_count = models.PositiveIntegerField(default=0)
     verified = models.BooleanField(default=False, db_index=True)
     latitude  = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -83,17 +99,39 @@ class Place(models.Model):
 
         verbose_name = 'Place'
         verbose_name_plural = 'Places'
-        ordering = ["-rating", "-review_count"]
         indexes = [
-            
             models.Index(fields=["type"]),
             models.Index(fields=["latitude", "longitude"]),
         ]
 
     def __str__(self):
         """Unicode representation of Place."""
-        return f"{self.name} - ({self.type}) - ({self.rating})"
+        return f"{self.name} - ({self.type})"
 
     def get_absolute_url(self):
         """Return absolute url for Place."""
         return reverse('place-detail', kwargs={'pk': self.pk})
+
+
+class Review(models.Model):
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Meta definition for Review."""
+
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
+
+    def __str__(self):
+        """Unicode representation of Review."""
+        return f"{self.user} - {self.place}"
+
+    def get_absolute_url(self):
+        """Return absolute url for Review."""
+        return reverse('review-detail', kwargs={'pk': self.pk})

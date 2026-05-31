@@ -17,13 +17,36 @@ class PlaceSerializer(serializers.ModelSerializer):
     detail_url = serializers.SerializerMethodField()
     type = TypeSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
+    
+    avg_rating = serializers.SerializerMethodField(read_only=True)
+    review_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Place
-        fields = "__all__"
+        fields = [
+            'id', 'name', 'description', 'type', 'tags', 'phone', 'website',
+            'verified', 'latitude', 'longitude', 'created_at', 'detail_url',
+            'avg_rating',
+            'review_count',
+        ]
 
+    def get_avg_rating(self, obj):
+        return float(obj.avg_rating) if obj.avg_rating is not None else None
+    
     def get_detail_url(self, obj):
         return reverse('places:place-detail-view', args=[obj.pk])
+
+# class PlaceSerializer(serializers.ModelSerializer):
+#     detail_url = serializers.SerializerMethodField()
+#     type = TypeSerializer(read_only=True)
+#     tags = TagSerializer(many=True, read_only=True)
+
+#     class Meta:
+#         model = Place
+#         fields = "__all__"
+
+#     def get_detail_url(self, obj):
+#         return reverse('places:place-detail-view', args=[obj.pk])
     
 
 # class PlaceSerializer(serializers.ModelSerializer):

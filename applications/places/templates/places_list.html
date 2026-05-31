@@ -86,7 +86,7 @@
               <p class="card-text">
                 [[ selectedPlace.verified ? 'Verified' : 'Not Verified' ]]
               </p>
-              <h5 class="card-title">Rating: [[ selectedPlace.rating || '—' ]] / Reviews: [[ selectedPlace.review_count ]]</h5>
+              <h5 class="card-title">Rating: [[ selectedPlace.avg_rating || '—' ]] / Reviews: [[ selectedPlace.review_count ]]</h5>
               <p class="card-text">
                 Tags:
                 <span v-for="tag in selectedPlace.tags" :key="tag.id" class="badge rounded-pill text-bg-primary">[[ tag.name ]]</span>

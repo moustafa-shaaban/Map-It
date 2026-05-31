@@ -22,12 +22,12 @@ class PlaceFilter(django_filters.FilterSet):
     )
 
     rating_min = django_filters.NumberFilter(
-        field_name="rating",
+        field_name="avg_rating",
         lookup_expr="gte",
         label="Minimum rating",
     )
     rating_max = django_filters.NumberFilter(
-        field_name="rating",
+        field_name="avg_rating",
         lookup_expr="lte",
         label="Maximum rating",
     )

@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit{% else %}Create{% endif %} Place
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h1>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Place</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col">
+                    {{ form.name|as_crispy_field }}
+                </div>
+                <div class="col">
+                    {{ form.type|as_crispy_field }}
+                </div>
+            </div>
+
+            <div class="row">
+                {{ form.description|as_crispy_field }}
+            </div>
+
+            <div class="row">
+                {{ form.tags|as_crispy_field }}
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    {{ form.phone|as_crispy_field }}
+                </div>
+                <div class="col">
+                    {{ form.website|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ form.latitude|as_crispy_field }}
+                </div>
+                <div class="col">
+                    {{ form.longitude|as_crispy_field }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{% url 'places:place-list-view' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+
+        <div class="mt-4">
+            <h4>Click on the map to set coordinates</h4>
+            <div id="location-map" style="height: 300px; width: 100%;"></div>
+            <small class="text-muted">Current coordinates: 
+                <span id="coordinates-display">
+                    {% if form.instance.pk %}
+                        {{ form.instance.latitude|stringformat:"f" }}, {{ form.instance.longitude|stringformat:"f" }}
+                    {% else %}
+                        Not set yet
+                    {% endif %}
+                </span>
+            </small>
+        </div>
+    </div>
+
+    {{ initial_place|json_script:"form-data" }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formData = JSON.parse(document.getElementById('form-data').textContent);
+
+            const placeCoordinates = formData.latitude && formData.longitude;
+            const defaultCoords = placeCoordinates ? [formData.latitude, formData.longitude] : [0, 0];
+            
+            const defaultZoom = placeCoordinates ? 15 : 2; 
+
+            let map = L.map('location-map').setView(defaultCoords, defaultZoom);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France',
+                maxZoom: 19,
+            }).addTo(map);
+
+            let marker = null;
+
+            if (placeCoordinates) {
+                marker = L.marker([formData.latitude, formData.longitude]).addTo(map)
+                    .bindPopup(document.createTextNode("Current place").textContent)
+                    .openPopup();
+            }
+
+            map.on('click', function (e) {
+                const lat = Math.round(e.latlng.lat * 1e6) / 1e6;
+                const lng = Math.round(e.latlng.lng * 1e6) / 1e6;
+
+                document.getElementById('id_latitude').value = lat;
+                document.getElementById('id_longitude').value = lng;
+
+                document.getElementById('coordinates-display').textContent = lat + ', ' + lng;
+
+                if (marker) {
+                    marker.setLatLng([lat, lng]);
+                    marker.setPopupContent(document.createTextNode("Current Coordinates").textContent);
+                    marker.openPopup();
+                } else {
+                    marker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup(document.createTextNode("Current Coordinates").textContent)
+                        .openPopup();
+                }
+
+                map.setView([lat, lng], 12); 
+            });
+
+        });
+    </script>
+{% endblock content %}

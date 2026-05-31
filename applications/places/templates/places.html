@@ -6,6 +6,7 @@
 
 {% block content %}
     <div class="container mt-3">
+        <a role="button" class="btn btn-primary" href="{% url 'places:place-create-view' %}">Add Place</a>
         <table class="table table-bordered table-responsive">
             <thead>
                 <tr>
@@ -22,7 +23,7 @@
                 {% for place in places %}
                 <tr>
                     <th scope="row">{{ place.name.capitalize }}</th>
-                    <th scope="row">{{ place.rating }}</th>
+                    <th scope="row">{{ place.avg_rating|floatformat:1|default:"N/A" }}</th>
                     <th scope="row">{{ place.review_count }}</th>
                     
                     {% if place.verified %}
@@ -49,7 +50,7 @@
                     </th>
 
                     <th scope="row">
-                        <button class="btn btn-primary">Edit</button>
+                        <a role="button" class="btn btn-primary" href="{% url 'places:place-update-view' pk=place.id %}">Edit</a>
                         <button class="btn btn-danger">Delete</button>
                     </th>
                 </tr>
