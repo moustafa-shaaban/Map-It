@@ -36,7 +36,3 @@ Libraries and Packages used
 * [Folium](https://python-visualization.github.io/folium/)
 
 :::
-
-
-
-

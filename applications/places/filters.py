@@ -21,40 +21,29 @@ class PlaceFilter(django_filters.FilterSet):
         queryset=Tag.objects.all()
     )
 
-    rating_min = django_filters.NumberFilter(
+    min_rating = django_filters.NumberFilter(
         field_name="avg_rating",
         lookup_expr="gte",
         label="Minimum rating",
     )
-    rating_max = django_filters.NumberFilter(
+    max_rating = django_filters.NumberFilter(
         field_name="avg_rating",
         lookup_expr="lte",
         label="Maximum rating",
     )
 
-    review_count_min = django_filters.NumberFilter(
+    min_review_count = django_filters.NumberFilter(
         field_name="review_count",
         lookup_expr="gte",
         label="Minimum review count",
     )
-    review_count_max = django_filters.NumberFilter(
+    max_review_count = django_filters.NumberFilter(
         field_name="review_count",
         lookup_expr="lte",
         label="Maximum review count",
     )
 
     verified = django_filters.BooleanFilter(label="Verified only")
-
-    # --- Ordering ---
-    # ordering = django_filters.OrderingFilter(
-    #     fields=(
-    #         ("name",         "name"),
-    #         ("rating",       "rating"),
-    #         ("review_count", "review_count"),
-    #         ("created_at",   "created_at"),
-    #     ),
-    #     label="Order by",
-    # )
 
     search = django_filters.CharFilter(
         method="filter_search",
@@ -71,7 +60,7 @@ class PlaceFilter(django_filters.FilterSet):
         model = Place
         fields = [
             "name", "type", "tags", "verified",
-            "rating_min", "rating_max",
-            "review_count_min", "review_count_max",
-            "search", #"ordering",
+            "min_rating", "max_rating",
+            "min_review_count", "max_review_count",
+            "search",
         ]

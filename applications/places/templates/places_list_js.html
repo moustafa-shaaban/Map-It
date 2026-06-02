@@ -105,12 +105,12 @@
                     <div class="row">{{ filter.form.type|as_crispy_field }}</div>
                     <div class="row">{{ filter.form.tags|as_crispy_field }}</div>
                     <div class="row">
-                        <div class="col">{{ filter.form.rating_min|as_crispy_field }}</div>
-                        <div class="col">{{ filter.form.rating_max|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.min_rating|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.max_rating|as_crispy_field }}</div>
                     </div>
                     <div class="row">
-                        <div class="col">{{ filter.form.review_count_min|as_crispy_field }}</div>
-                        <div class="col">{{ filter.form.review_count_max|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.min_review_count|as_crispy_field }}</div>
+                        <div class="col">{{ filter.form.max_review_count|as_crispy_field }}</div>
                     </div>
                     <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
                     <button type="button" id="reset-btn" class="btn btn-secondary">Reset</button>

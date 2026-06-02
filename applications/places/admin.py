@@ -19,7 +19,13 @@ class PlaceAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 
+class ReviewAdmin(admin.ModelAdmin):
+    model = Review
+    list_display = ("place", "user", "rating", "created_at")
+    search_fields = ["place", "user"]
+    list_filter = ["rating"]
+
 admin.site.register(Type, TypeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Place, PlaceAdmin)
-admin.site.register(Review)
+admin.site.register(Review, ReviewAdmin)

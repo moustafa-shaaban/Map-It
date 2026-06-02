@@ -10,7 +10,7 @@ This page lists the sturcture of seattle application, and the files used to buil
 
 ## Utils
 
-I start by a very useful util function that will be used to many actions in the project, it's main functionality is to remove some special characters, trim/strip white spaces from text and save strings data in lower-case.
+We start by a very useful utility function that will be used in many actions in the project, it's main functionality is to remove some special characters, trim/strip white spaces from text and save strings data in lower-case.
 
 This is useful becuase we need to make sure that the data (facility name for hospitals, and name for schools and libraries) are unique.
 
@@ -350,7 +350,7 @@ class LibraryResource(resources.ModelResource):
 
 ## Admin
 
-This file is used to register the database models used for `CRUD` (Create, Read, Update and Delete) actions for each model, and, three classed that extends `ImportExportModelAdmin` from `django-import-export` to add the functionality of importing/exporting data from the Django admin site.
+This file is used to register the database models used for `CRUD` (Create, Read, Update and Delete) actions for each model, and, thre classes that extends `ImportExportModelAdmin` from `django-import-export` to add the functionality of importing/exporting data from the Django admin site.
 
 I also added the functionality of listing each admin model by all the fields, and searching on each admin model by `facility/name` + `address` fields.
 
