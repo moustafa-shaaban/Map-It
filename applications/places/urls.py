@@ -11,6 +11,7 @@ urlpatterns = [
     path('<int:pk>/', views.PlaceDetailView.as_view(), name='place-detail-view'),
     path('create/', views.create_place, name='place-create-view'),
     path('<int:pk>/update/', views.update_place, name='place-update-view'),
+    path('<int:pk>/delete/', views.PlaceDeleteView.as_view(), name='place-delete-view'),
     # path('api/places/create', views.PlaceCreateView.as_view(), name='place-create-view'),
     # path('api/places/<int:pk>/update', views.PlaceUpdateView.as_view(), name='place-update-view'),
 ]

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="mt-5">
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="col-6">
+
+            <h2>Delete Place</h2>
+            <form method="post" action="{% url 'places:place-delete-view' place.id %}">
+                {% csrf_token %}
+                <div class="col">
+                    <div class="row">
+                        {{ form.title|crispy }}
+                    </div>
+                </div>
+                <p>Are you sure you want to delete: {{ place.name }}?</p>
+                <hr>
+                <div class="form-inline my-2 my-lg-0">
+                    <a role="button" class="btn btn-info mx-2" href="{% url 'places:place-detail-view' place.id %}">Cancel</a>
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                </div>    
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

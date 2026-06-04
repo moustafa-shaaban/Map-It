@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.views.generic import ListView, DetailView, UpdateView, CreateView
+from django.views.generic import DeleteView, ListView, DetailView, UpdateView, CreateView
 from django.db.models import Avg, Count
 
 from .models import Place
@@ -125,31 +126,8 @@ def update_place(request, pk):
     return render(request, 'places/place_form.html', context=context)
 
 
-# class PlaceCreateView(CreateView):
-#     model = Place
-#     form_class = PlaceForm
-#     template_name = 'places/place_form.html'
-#     success_url = reverse_lazy('places:place-list-view')
 
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['map_mode'] = 'create'
-#         context['initial_latitude'] = '30'
-#         context['initial_longitude'] = '30'
-#         context['initial_zoom'] = 2
-#         return context
-    
-
-# class PlaceUpdateView(UpdateView):
-#     model = Place
-#     form_class = PlaceForm
-#     template_name = 'places/place_form.html'
-#     success_url = reverse_lazy('places:place-list-view')
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['map_mode'] = 'update'
-#         context['initial_latitude'] = float(self.object.latitude)
-#         context['initial_longitude'] = float(self.object.longitude)
-#         context['initial_zoom'] = 13
-#         return context
+class PlaceDeleteView(DeleteView):
+    model = Place
+    template_name = "places/confirm_delete_place.html"
+    success_url = reverse_lazy("places:place-list-view")
