@@ -17,6 +17,8 @@ class PlaceAdmin(admin.ModelAdmin):
     list_display = ("name", "type", "latitude", "longitude", "created_at")
     list_filter = ("type", "tags", "verified")
     search_fields = ["name"]
+    autocomplete_fields = ("type",)
+    filter_horizontal = ('tags',)
 
 
 class ReviewAdmin(admin.ModelAdmin):
