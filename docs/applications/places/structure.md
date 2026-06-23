@@ -358,6 +358,8 @@ class PlaceAdmin(admin.ModelAdmin):
     list_display = ("name", "type", "latitude", "longitude", "created_at")
     list_filter = ("type", "tags", "verified")
     search_fields = ["name"]
+    autocomplete_fields = ("type",)
+    filter_horizontal = ('tags',)
 
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -445,3 +447,34 @@ class PlaceFilter(django_filters.FilterSet):
         ]
 ```
 
+## URLS
+
+Currently this application has 7 urls, the first url is for displaying the homepage, the secound url is for the the django_rest_framework serialzed data for the Place model, and the rest of the urls is for handing CRUD actions (Create, Read, Update and Delete) for the Place model
+
+```python
+from django.urls import path
+
+from . import views
+
+app_name = 'places'
+
+urlpatterns = [
+    path("", views.map_view, name='places-map'),
+    path('api/places/', views.places_list, name='places-api'),
+    path('places/', views.PlacesListView.as_view(), name='place-list-view'),
+    path('<int:pk>/', views.PlaceDetailView.as_view(), name='place-detail-view'),
+    path('create/', views.create_place, name='place-create-view'),
+    path('<int:pk>/update/', views.update_place, name='place-update-view'),
+    path('<int:pk>/delete/', views.PlaceDeleteView.as_view(), name='place-delete-view'),
+    # path('api/places/create', views.PlaceCreateView.as_view(), name='place-create-view'),
+    # path('api/places/<int:pk>/update', views.PlaceUpdateView.as_view(), name='place-update-view'),
+]
+```
+
+## Forms
+
+Here, there are three forms `TypeForm`, `TagForm` and the main `PlaceForm`.
+
+### TypeForm and TagForm
+
+These forms are used in adding `types` and `tags` for the `Type` and `Tag` models

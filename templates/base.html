@@ -22,6 +22,11 @@
 
     <script src="{% static 'js/sweetalert2.all.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/select2-bootstrap-5-theme.min.css' %}">
+    <script src="{% static 'js/select2.min.js' %}"></script>
     <!-- <meta name="theme-color" content="#712cf9" /> -->
     <link rel="shortcut icon" type="image/png" href="{% static 'images/django-icon-256.png' %}" >
     <style>
@@ -29,6 +34,44 @@
           background-color: transparent !important;
           color: inherit !important;
       }
+
+      [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection,
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown,
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
+            color: var(--bs-body-color) !important;
+            background-color: var(--bs-body-bg) !important;
+            border-color: var(--bs-border-color) !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-results__option--highlighted {
+            background-color: var(--bs-primary) !important;
+            color: white !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            color: var(--bs-body-color) !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered {
+            color: var(--bs-body-color) !important;
+            background-color: var(--bs-body-bg) !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+            background-color: var(--bs-secondary-bg) !important;
+            border-color: var(--bs-border-color) !important;
+            color: var(--bs-body-color) !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+            color: var(--bs-secondary-color) !important;
+            border-color: var(--bs-border-color) !important;
+        }
+
+        [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove:hover {
+            background-color: var(--bs-danger) !important;
+            color: white !important;
+        }
     </style>
     {% block styles %}{% endblock styles %}
     {% htmx_script %}
