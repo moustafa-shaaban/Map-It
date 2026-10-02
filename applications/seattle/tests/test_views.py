@@ -6,7 +6,7 @@ from django.contrib.messages import get_messages
 import json
 import csv
 import io
-
+from applications.core.utils import AuthenticatedTestCase
 from applications.seattle.models import School
 # from applications.seattle.views import MapView
 
@@ -92,11 +92,11 @@ def create_json_file(data: list[dict]) -> bytes:
     return json.dumps(data, indent=2).encode('utf-8')
 
 
-class ImportHospitalsTests(TestCase):
-
-    def setUp(self):
-        self.client = Client()
-        self.url = reverse('seattle:import-hospitals')
+class ImportHospitalsTests(AuthenticatedTestCase):
+    url_name = "seattle:import-hospitals"
+    # def setUp(self):
+    #     self.client = Client()
+    #     self.url = reverse('seattle:import-hospitals')
 
     def test_uploading_csv_file(self):
         csv_data = [
@@ -277,11 +277,11 @@ class ImportHospitalsTests(TestCase):
         self.assertIn("File exceeded the maximum size. Max size is 5MB.", str(form.errors))
 
 
-class ImportSchoolsTests(TestCase):
-
-    def setUp(self):
-        self.client = Client()
-        self.url = reverse('seattle:import-schools')
+class ImportSchoolsTests(AuthenticatedTestCase):
+    url_name = "seattle:import-schools"
+    # def setUp(self):
+    #     self.client = Client()
+    #     self.url = reverse('seattle:import-schools')
 
     def test_uploading_csv_file(self):
         csv_data = [
@@ -471,11 +471,11 @@ class ImportSchoolsTests(TestCase):
         self.assertIn("File exceeded the maximum size. Max size is 5MB.", str(form.errors))
 
 
-class ImportLibrariesTests(TestCase):
-
-    def setUp(self):
-        self.client = Client()
-        self.url = reverse('seattle:import-libraries')
+class ImportLibrariesTests(AuthenticatedTestCase):
+    url_name = "seattle:import-libraries"
+    # def setUp(self):
+    #     self.client = Client()
+    #     self.url = reverse('seattle:import-libraries')
 
     def test_uploading_csv_file(self):
         csv_data = [

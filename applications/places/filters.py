@@ -47,7 +47,7 @@ class PlaceFilter(django_filters.FilterSet):
 
     search = django_filters.CharFilter(
         method="filter_search",
-        label="Search (name, description)",
+        label="Quick Search by name or description",
     )
 
     def filter_search(self, queryset, name, value):

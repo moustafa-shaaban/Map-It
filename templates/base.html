@@ -76,7 +76,7 @@
     {% block styles %}{% endblock styles %}
     {% htmx_script %}
 </head>
-<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}' class="min-vh-100 d-flex flex-shrink-0 flex-column">
+<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}' class="vh-100 d-flex flex-shrink-0 flex-column">
   {% include 'header.html' %}
       
   {% block body %}

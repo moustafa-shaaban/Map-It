@@ -7,19 +7,24 @@ import folium
 from folium.plugins import MarkerCluster
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+
 
 class AuthenticatedTestCase(TestCase):
+    url_name = None
+
     @classmethod
     def setUpTestData(cls):
-        User = get_user_model()
-
-        cls.user = User.objects.create_user(
+        cls.user = get_user_model().objects.create_user(
             username="testuser",
             password="testpassword123",
         )
 
     def setUp(self):
         self.client.force_login(self.user)
+
+        if self.url_name is not None:
+            self.url = reverse(self.url_name)
 
 # def normalize_text(text):
 #     """Full normalization for uniqueness. Writen with help from Grok AI"""

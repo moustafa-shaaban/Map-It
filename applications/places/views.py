@@ -3,17 +3,18 @@ from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.generic import DeleteView, ListView, DetailView, UpdateView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
-
+from django_filters.views import FilterView
 from .models import Place
 from .filters import PlaceFilter
 from .serializers import PlaceSerializer
 from .forms import PlaceForm
 
-
+@login_required
 @api_view(['GET'])
 def places_list(request):
-
     """
         Important Note:
             Changing the queryset 
@@ -43,26 +44,28 @@ def places_list(request):
         'has_filter': any(field in request.GET for field in place_filter.get_fields())
     })
 
+@login_required
 def map_view(request):
-    place_filter = PlaceFilter(request.GET, queryset=Place.objects.all())
+    place_filter = PlaceFilter(request.GET, queryset=Place.objects.select_related('type').prefetch_related('tags'))
     context = {
         'filter': place_filter,
     }
-    return render(request, 'places_list.html', context)
+    return render(request, 'places_map.html', context)
 
 
-class PlacesListView(ListView):
+class PlacesListView(LoginRequiredMixin, FilterView):
     model = Place
+    filterset_class = PlaceFilter
     context_object_name = 'places'
     paginate_by = 10
-    template_name = 'places.html'
+    template_name = 'places_list.html'
     queryset = Place.objects.select_related('type').prefetch_related('tags').annotate(
         avg_rating=Avg("reviews__rating"),
         review_count=Count("reviews")
     ).order_by("-avg_rating", "-review_count")
 
 
-class PlaceDetailView(DetailView):
+class PlaceDetailView(LoginRequiredMixin, DetailView):
     model = Place
     template_name = 'place_detail.html'
     queryset = Place.objects.select_related('type').prefetch_related('tags').annotate(
@@ -70,7 +73,7 @@ class PlaceDetailView(DetailView):
         review_count=Count("reviews")
     )
 
-
+@login_required
 def create_place(request):
     if request.method == 'POST':
         form = PlaceForm(request.POST)
@@ -81,7 +84,7 @@ def create_place(request):
         form = PlaceForm()
     return render(request, 'places/place_form.html', { 'form': form })
 
-
+@login_required
 def update_place(request, pk):
     place = get_object_or_404(Place, pk = pk)
     if request.method == 'POST':
@@ -127,7 +130,7 @@ def update_place(request, pk):
 
 
 
-class PlaceDeleteView(DeleteView):
+class PlaceDeleteView(LoginRequiredMixin, DeleteView):
     model = Place
     template_name = "places/confirm_delete_place.html"
     success_url = reverse_lazy("places:place-list-view")

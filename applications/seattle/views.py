@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.utils.html import escape
 from django.views import generic
 from django.contrib import messages
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 # from django.utils.html import escape
 
 from .models import Hospital, School, Library
@@ -15,7 +16,7 @@ from .mixins import BaseDataImport, BaseDataExport
 
 
 
-class HomePage(generic.TemplateView):
+class HomePage(LoginRequiredMixin, generic.TemplateView):
     """ Class used for displaying website's main page. """
     template_name = 'seattle/seattle_homepage.html'
 
@@ -54,6 +55,7 @@ LAYERS = [
 DEFAULT_LOCATION = [47.6062100, -122.3320700]
 DEFAULT_ZOOM = 11
 
+@login_required
 def map_view(request):
     query = request.GET.get('q', '').strip()[:200]
 

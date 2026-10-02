@@ -1,109 +1,126 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from applications.core.utils import AuthenticatedTestCase
 
-class HomepageTests(TestCase):
+class HomepageTests(AuthenticatedTestCase):
+    url_name = "seattle:seattle-homepage"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:seattle-homepage"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:seattle-homepage"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/seattle_homepage.html")
 
-class MapPageTests(TestCase):
+class MapPageTests(AuthenticatedTestCase):
+    url_name = "seattle:seattle-map"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/map/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:seattle-map"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:seattle-map"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/map.html")
 
 
-class HospitalsDataImportPageTests(TestCase):
+class HospitalsDataImportPageTests(AuthenticatedTestCase):
+    url_name = "seattle:import-hospitals"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/import-hospitals/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:import-hospitals"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:import-hospitals"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/import_hospitals_data.html")
 
-class HospitalsDataExporttPageTests(TestCase):
+class HospitalsDataExporttPageTests(AuthenticatedTestCase):
+    url_name = "seattle:export-hospitals"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/export-hospitals/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:export-hospitals"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:export-hospitals"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/export_hospitals_data.html")
 
-class SchoolsDataImportPageTests(TestCase):
+class SchoolsDataImportPageTests(AuthenticatedTestCase):
+    url_name = "seattle:import-schools"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/import-schools/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:import-schools"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:import-schools"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/import_schools_data.html")
 
-class SchoolsDataExporttPageTests(TestCase):
+class SchoolsDataExporttPageTests(AuthenticatedTestCase):
+    url_name = "seattle:export-schools"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/export-schools/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:export-schools"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:export-schools"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/export_schools_data.html")
 
 
-class LibrariesDataImportPageTests(TestCase):
+class LibrariesDataImportPageTests(AuthenticatedTestCase):
+    url_name = "seattle:import-libraries"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/import-libraries/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:import-libraries"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:import-libraries"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/import_libraries_data.html")
 
-class LibrariesDataExporttPageTests(TestCase):
+class LibrariesDataExporttPageTests(AuthenticatedTestCase):
+    url_name = "seattle:export-libraries"
+
     def test_url_exists_at_correct_location(self):
-        response = self.client.get("/seattle/export-libraries/")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_url_available_by_name(self):
-        response = self.client.get(reverse("seattle:export-libraries"))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
     def test_template_name_correct(self):
-        response = self.client.get(reverse("seattle:export-libraries"))
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "seattle/export_libraries_data.html")

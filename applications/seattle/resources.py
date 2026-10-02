@@ -1,6 +1,6 @@
 from import_export import resources
 from .models import Hospital, School, Library
-from .utils import normalize_text
+from applications.core.utils import normalize_text
 
 class HospitalResource(resources.ModelResource):
     class Meta:

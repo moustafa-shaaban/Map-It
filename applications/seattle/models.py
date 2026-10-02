@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models.functions import Lower, Trim
 
-from .utils import normalize_text
+from applications.core.utils import normalize_text
 
 
 class Hospital(models.Model):

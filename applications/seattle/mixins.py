@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.views import View
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
 from django.http import HttpResponse
 from tablib import Dataset
@@ -11,7 +12,7 @@ from import_export.results import RowResult
 
 from .forms import UploadFileForm, ExportForm
 
-class BaseDataImport(View):
+class BaseDataImport(LoginRequiredMixin, View):
     model = None
     template_name = None
     resource_class = None
@@ -112,7 +113,7 @@ class BaseDataImport(View):
         return redirect(self.success_url)
     
 
-class BaseDataExport(View):
+class BaseDataExport(LoginRequiredMixin, View):
     resource_class = None
     filename = 'export'
     template_name = 'export.html'

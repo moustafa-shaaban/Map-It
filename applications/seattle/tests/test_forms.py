@@ -16,9 +16,9 @@ from applications.seattle.forms import UploadFileForm, validate_file_size, valid
 from applications.seattle.models import Hospital, School, Library
 from applications.seattle.resources import HospitalResource, SchoolResource, LibraryResource
 from applications.seattle.resources import HospitalResource, SchoolResource, LibraryResource
+from applications.core.utils import AuthenticatedTestCase
 
-
-class UploadFileFormTest(TestCase):
+class UploadFileFormTest(AuthenticatedTestCase):
     """Test cases for UploadFileForm"""
 
     def setUp(self):
@@ -111,7 +111,7 @@ class UploadFileFormTest(TestCase):
         self.assertIn("exceeded the maximum size", str(context.exception))
     
 
-class FileTypeValidationTest(TestCase):
+class FileTypeValidationTest(AuthenticatedTestCase):
     """Test cases for file type validation"""
     @patch('applications.seattle.forms.magic')
     def test_valid_csv_mime_type(self, mock_magic):

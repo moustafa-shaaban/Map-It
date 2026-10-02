@@ -5,7 +5,7 @@ from factory.django import DjangoModelFactory
 import numpy as np
 from faker import Faker
 
-from applications.seattle.utils import normalize_text
+from applications.core.utils import normalize_text
 from .models import Type, Place, Tag
 
 fake = Faker()

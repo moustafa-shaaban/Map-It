@@ -6,19 +6,29 @@ Home
 
 {% block body %}
     {% block content %}
-    <div class="p-5 text-center bg-body-tertiary rounded-3">
+    <div class="d-flex flex-column card justify-content-center align-items-center vh-100">
         <h1 class="text-body-emphasis">Map-It</h1>
-        <p class="col-lg-8 mx-auto fs-5 text-muted">
-            Map-It
+        <p class="text-wrap text-muted">
+            A web mapping application built using Django Web Framework, Django Rest Framework, Vue JS 3, Leaflet JS and Bootstrap v5+
         </p>
         <div class="d-inline-flex gap-2 mb-5"> 
+           
+           {% if request.user.is_authenticated %}
+             <a
+                href="{% url 'seattle:seattle-homepage' %}"
+                class="d-inline-flex align-items-center btn btn-outline-primary btn-lg px-4 rounded-pill" role="button">
+                Seattle City
+            </a> 
+            <a href="{% url 'places:place-list-view' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill" role="button">
+                Places
+            </a> 
+            {% else %}
             <a
+                href="{% url 'account_login' %}"
                 class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" role="button">
-                Call to action
+                Login To Get Started
             </a> 
-            <a class="btn btn-outline-secondary btn-lg px-4 rounded-pill" role="button">
-                Secondary link
-            </a> 
+           {% endif %}
         </div>
     </div>
     {% endblock content %}

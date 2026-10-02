@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'silk',
 
     # My Apps
+    'applications.core',
     'applications.users',
     'applications.seattle',
     'applications.places',
