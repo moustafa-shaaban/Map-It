@@ -14,6 +14,10 @@ hero:
       text: Places
       link: ./places/index.md
 
+    - theme: alt
+      text: Core
+      link: ./core/index.md
+
 ---
 
 
@@ -38,3 +42,7 @@ hero:
 * [django-import-export](https://django-import-export.readthedocs.io/en/latest/)
 
 * [Leaflet.js](https://leafletjs.com/)
+
+## 3. Core
+
+Shared utils that will be reused in multiple applications.

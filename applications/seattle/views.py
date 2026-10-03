@@ -72,13 +72,20 @@ def map_view(request):
         for obj in layer['queryset']
     ]
 
+    openstreetmap_hot_attr = (
+            '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'
+        )
+    openstreetmap_hot_url = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
+        
+    openstreetmap_hot_tile = folium.TileLayer(tiles=openstreetmap_hot_url, attr=openstreetmap_hot_attr, name="OpenStreetMap HOT")
+
     folium_map = folium.Map(
         location=DEFAULT_LOCATION,
-        tiles='cartodbpositron',
+        tiles=openstreetmap_hot_tile,
         zoom_start=DEFAULT_ZOOM,
         attr='Seattle City'
     )
-    folium.TileLayer('cartodbdark_matter').add_to(folium_map)
+
 
     for layer in filtered_layers:
         render_markers(folium_map, layer, layer['queryset'])

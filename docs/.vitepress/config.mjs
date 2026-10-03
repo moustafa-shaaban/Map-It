@@ -12,9 +12,10 @@ export default defineConfig({
       {
         text: 'Applications',
         items: [
-          { text: 'Applications', link: '/applications' },
+          { text: 'Overview', link: '/applications' },
           { text: 'Seattle', link: '/applications/seattle' },
           { text: 'Places', link: '/applications/places' },
+          { text: 'Core', link: '/applications/core/index.md' },
         ]
       },
       // { text: 'Examples', link: '/markdown-examples' },
@@ -23,20 +24,21 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Applications',
+        text: 'Applications List',
         items: [
-          { text: 'Applications', link: '/applications' },
+          { text: 'Overview', link: '/applications' },
           { text: 'Seattle', link: '/applications/seattle/index.md' },
           { text: 'Places', link: '/applications/places/index.md' },
+          { text: 'Core', link: '/applications/core/index.md' },
         ]
       },
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      },
+      // {
+      //   text: 'Examples',
+      //   items: [
+      //     { text: 'Markdown Examples', link: '/markdown-examples' },
+      //     { text: 'Runtime API Examples', link: '/api-examples' }
+      //   ]
+      // },
       { text: 'Team', link: '/team' },
     ],
     outline: {
