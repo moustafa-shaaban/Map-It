@@ -316,9 +316,9 @@ crispy-bootstrap5==2026.9 \
     --hash=sha256:b65409c50f5b71383770075e6cbb8335405efa1487f874ff6be6f2f6953b041c \
     --hash=sha256:e574e6e910e97f5a32f5a18cc632d8bfd71cc4cb0f8fdd531e15f8618af2488b
     # via backend
-cron-descriptor==1.4.5 \
-    --hash=sha256:736b3ae9d1a99bc3dbfc5b55b5e6e7c12031e7ba5de716625772f8b02dcd6013 \
-    --hash=sha256:f51ce4ffc1d1f2816939add8524f206c376a42c87a5fca3091ce26725b3b1bca
+cron-descriptor==2.3.1 \
+    --hash=sha256:7112f8f682c14e0fd17377c0e0e514764ac9b64eae8c1df7e1c52d702b39ea40 \
+    --hash=sha256:edb8030b338c0be798c15e71906fe76eb7f1b135fd18d5e43a70351d93532387
     # via django-celery-beat
 cryptography==50.0.2 \
     --hash=sha256:0ddc924c04591c2811ca024d62ecad4f7f6f08af8939c211438f48a16bd23602 \
