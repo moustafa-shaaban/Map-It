@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% load allauth %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row flex-grow-1">
+
+        <!-- Sidebar -->
+        <aside class="col-12 col-md-4 col-lg-3 col-xl-2 bg-body-tertiary py-4">
+            <ul class="nav nav-pills flex-md-column flex-row flex-nowrap overflow-auto mb-3">
+
+                {% url 'account_email' as email_url_ %}
+                {% if email_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_email %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ email_url_ }}">
+                        Change Email
+                    </a>
+                </li>
+                {% endif %}
+
+                {% url 'account_change_password' as change_password_url_ %}
+                {% if change_password_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_password %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ change_password_url_ }}">
+                        Change Password
+                    </a>
+                </li>
+                {% endif %}
+
+                {% url 'account_change_phone' as phone_url_ %}
+                {% if phone_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_phone %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ phone_url_ }}">
+                        Change Phone
+                    </a>
+                </li>
+                {% endif %}
+
+                {% url 'socialaccount_connections' as connections_url_ %}
+                {% if connections_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_socialaccount %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ connections_url_ }}">
+                        Third-Party Accounts
+                    </a>
+                </li>
+                {% endif %}
+
+                {% url 'mfa_index' as mfa_index_url_ %}
+                {% if mfa_index_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_mfa %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ mfa_index_url_ }}">
+                        Two-Factor Authentication
+                    </a>
+                </li>
+                {% endif %}
+
+                {% url 'usersessions_list' as usersessions_list_url_ %}
+                {% if usersessions_list_url_ %}
+                <li class="nav-item">
+                    <a class="{% block nav_class_usersessions %}nav-link{% endblock %} link-body-emphasis"
+                       href="{{ usersessions_list_url_ }}">
+                        Sessions
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link link-body-emphasis"
+                       href="{% url 'users:update-profile' %}">
+                        Update Profile
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="col-12 col-md-8 col-lg-9 col-xl-10 py-4">
+            <div id="content" class="container-fluid">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+    </div>
+</div>
+{% endblock %}
