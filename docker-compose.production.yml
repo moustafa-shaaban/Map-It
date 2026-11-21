@@ -82,7 +82,7 @@ services:
       - production_django_media:/usr/share/nginx/media:ro
 
   vitepress:
-    image: node:22-alpine
+    image: node:26-alpine
     working_dir: /app
     volumes:
       - ./vitepress-docs:/app
